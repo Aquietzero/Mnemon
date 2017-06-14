@@ -1,0 +1,45 @@
+.card {
+  width: 340px;
+  min-height: 500px;
+  box-shadow: 0 0 5px #ddd;
+  border: solid 1px #999;
+  border-radius: 10px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.card .section {
+  margin: 20px 0;
+}
+
+.card .header {
+  font-size: 0.5em;
+  color: #666;
+  text-align: center;
+}
+
+.card input,
+.card textarea {
+  border: none;
+  width: 100%;
+}
+.card input:focus,
+.card textarea:focus {
+  outline: none;
+}
+
+.card .title {
+  text-align: center;
+  font-size: 1.7em;
+  font-weight: bold;
+}
+
+.card .sub-title {
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.card .content {
+  font-size: 1em;
+  text-align: left;
+}
