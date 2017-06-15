@@ -1,3 +1,4 @@
+$ = require 'jquery'
 _ = require 'underscore'
 Backbone = require 'backbone'
 require './card.css'
@@ -9,13 +10,20 @@ class CardModel extends Backbone.Model
         title: 'Word'
         sub_title: 'A basic unit to express something.'
         content: 'Words build sentences, which build a language.'
-        tags: ['language', 'noun'],
-        connections: ['Sentence', 'Language'],
-        memory_aids: 'What? It\'s a word.',
+        # tags: ['language', 'noun'],
+        # connections: ['Sentence', 'Language'],
+        tags: []
+        connections: []
+        memory_aids: 'What? It\'s a word.'
 
 
 class Card extends Backbone.View
     className: 'card'
+
+    events:
+        'change input': 'updateModel'
+        'change textarea': 'updateModel'
+        'click .submit': 'submit'
 
     constructor: (options) ->
         super
@@ -31,5 +39,34 @@ class Card extends Backbone.View
         @
 
     fetch: (title) ->
+        $.ajax
+            url: '/cards/detail'
+            data: {title: title}
+            method: 'post'
+            success: (res) =>
+                unless res.message is 'ok'
+                    return alert JSON.stringify(res.error)
+                @model.set res.data
+                @render()
+
+    updateModel: (e) ->
+        $input = $(e.currentTarget)
+        key = $input.attr 'name'
+        val = $input.val()
+
+        if key and val
+            @model.set key, val
+
+    submit: ->
+        console.log @model.toJSON()
+
+        $.ajax
+            url: '/cards/update'
+            data: @model.toJSON()
+            method: 'post'
+            success: (res) =>
+                unless res.message is 'ok'
+                    return alert JSON.stringify(res.error)
+                window.location = "/#cards/#{res.data.title}"
 
 module.exports = Card

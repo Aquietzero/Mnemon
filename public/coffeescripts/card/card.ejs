@@ -1,24 +1,30 @@
 <div class="section">
-  <input class="title" type="text" value="<%= data.title %>" />
-  <input class="sub-title" type="text" value="<%= data.sub_title %>" />
+  <input class="title" name="title" type="text" value="<%= data.title %>" />
+  <input class="sub-title" name="sub-title" type="text" value="<%= data.sub_title %>" />
 </div>
 
 <hr />
 
 <div class="section">
-  <textarea id="" name=""><%= data.content %></textarea>
+  <textarea id="" name="content"><%= data.content %></textarea>
 </div>
 
 <div class="section">
   <div class="memory-aids-section">
     <div class="header">memory aids</div>
-    <input class="memory-aids" type="text" value="<%= data.memory_aids %>">
+    <input class="memory-aids" name="memory_aids" type="text" value="<%= data.memory_aids %>">
   </div>
 </div>
 
 <div class="section">
-  <div class="connections-section">
-    <div class="header">connections</div>
-    <input class="connections" type="text" value="<%= data.connections %>">
-  </div>
+  <% if (data.connections && data.connections.length > 0) { %>
+    <div class="connections-section">
+      <div class="header">connections</div>
+      <input class="connections" type="text" value="<%= data.connections %>">
+    </div>
+  <% } %>
+</div>
+
+<div class="operations">
+  <i class="circular big inverted write icon operation submit"></i>
 </div>

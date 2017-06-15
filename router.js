@@ -7,5 +7,5 @@ module.exports = function (app) {
 
     // Card
     app.post('/cards/detail', Routers.card.detail);
-    app.post('/cards/create', Routers.card.create);
+    app.post('/cards/update', Routers.card.update);
 }

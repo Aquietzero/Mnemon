@@ -68,7 +68,6 @@
 	  function App(options) {
 	    App.__super__.constructor.call(this, options);
 	    this.dashboard = new Dashboard();
-	    this.card = new Card();
 	  }
 
 	  App.prototype.render = function() {
@@ -76,10 +75,14 @@
 	  };
 
 	  App.prototype.renderPage = function(page, params) {
+	    var card;
 	    console.log("app: render " + page + ", " + params);
 	    switch (page) {
 	      case 'card':
-	        this.$('.content').html(this.card.render().el);
+	        card = new Card({
+	          title: params[0]
+	        });
+	        this.$('.content').html(card.render().el);
 	        break;
 	      default:
 	        this.render();
@@ -16449,7 +16452,7 @@
 
 	  Router.prototype.routes = {
 	    '': 'card',
-	    'card(/:title)': 'card'
+	    'cards(/:title)': 'card'
 	  };
 
 	  function Router(opts) {
@@ -18123,9 +18126,11 @@
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Backbone, Card, CardModel, _, template,
+	var $, Backbone, Card, CardModel, _, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
 
 	_ = __webpack_require__(22);
 
@@ -18146,8 +18151,8 @@
 	    title: 'Word',
 	    sub_title: 'A basic unit to express something.',
 	    content: 'Words build sentences, which build a language.',
-	    tags: ['language', 'noun'],
-	    connections: ['Sentence', 'Language'],
+	    tags: [],
+	    connections: [],
 	    memory_aids: 'What? It\'s a word.'
 	  };
 
@@ -18159,6 +18164,12 @@
 	  extend(Card, superClass);
 
 	  Card.prototype.className = 'card';
+
+	  Card.prototype.events = {
+	    'change input': 'updateModel',
+	    'change textarea': 'updateModel',
+	    'click .submit': 'submit'
+	  };
 
 	  function Card(options) {
 	    Card.__super__.constructor.apply(this, arguments);
@@ -18174,7 +18185,51 @@
 	    return this;
 	  };
 
-	  Card.prototype.fetch = function(title) {};
+	  Card.prototype.fetch = function(title) {
+	    return $.ajax({
+	      url: '/cards/detail',
+	      data: {
+	        title: title
+	      },
+	      method: 'post',
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(JSON.stringify(res.error));
+	          }
+	          _this.model.set(res.data);
+	          return _this.render();
+	        };
+	      })(this)
+	    });
+	  };
+
+	  Card.prototype.updateModel = function(e) {
+	    var $input, key, val;
+	    $input = $(e.currentTarget);
+	    key = $input.attr('name');
+	    val = $input.val();
+	    if (key && val) {
+	      return this.model.set(key, val);
+	    }
+	  };
+
+	  Card.prototype.submit = function() {
+	    console.log(this.model.toJSON());
+	    return $.ajax({
+	      url: '/cards/update',
+	      data: this.model.toJSON(),
+	      method: 'post',
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(JSON.stringify(res.error));
+	          }
+	          return window.location = "/#cards/" + res.data.title;
+	        };
+	      })(this)
+	    });
+	  };
 
 	  return Card;
 
@@ -18218,7 +18273,7 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n  padding: 20px;\n}\n\n.card .section {\n  margin: 20px 0;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n", ""]);
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n", ""]);
 
 	// exports
 
@@ -18228,18 +18283,23 @@
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
-	var __t, __p = '';
-	__p += '<div class="section">\n  <input class="title" type="text" value="' +
+	var __t, __p = '', __j = Array.prototype.join;
+	function print() { __p += __j.call(arguments, '') }
+	__p += '<div class="section">\n  <input class="title" name="title" type="text" value="' +
 	((__t = ( data.title )) == null ? '' : __t) +
-	'" />\n  <input class="sub-title" type="text" value="' +
+	'" />\n  <input class="sub-title" name="sub-title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
-	'" />\n</div>\n\n<br>\n\n<div class="section">\n  <textarea id="" name="">' +
+	'" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea id="" name="content">' +
 	((__t = ( data.content )) == null ? '' : __t) +
-	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" type="text" value="' +
+	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" name="memory_aids" type="text" value="' +
 	((__t = ( data.memory_aids )) == null ? '' : __t) +
-	'">\n  </div>\n</div>\n\n<div class="section">\n  <div class="connections-section">\n    <div class="header">connections</div>\n    <input class="connections" type="text" value="' +
+	'">\n  </div>\n</div>\n\n<div class="section">\n  ';
+	 if (data.connections && data.connections.length > 0) { ;
+	__p += '\n    <div class="connections-section">\n      <div class="header">connections</div>\n      <input class="connections" type="text" value="' +
 	((__t = ( data.connections )) == null ? '' : __t) +
-	'">\n  </div>\n</div>\n';
+	'">\n    </div>\n  ';
+	 } ;
+	__p += '\n</div>\n\n<div class="operations">\n  <i class="circular big inverted write icon operation submit"></i>\n</div>\n';
 	return __p
 	}
 

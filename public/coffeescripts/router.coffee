@@ -3,7 +3,7 @@ Backbone = require 'backbone'
 class Router extends Backbone.Router
     routes:
         '': 'card'
-        'card(/:title)': 'card'
+        'cards(/:title)': 'card'
 
     constructor: (opts) ->
         super opts
