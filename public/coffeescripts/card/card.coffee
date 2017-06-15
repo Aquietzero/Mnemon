@@ -3,7 +3,10 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 require './card.css'
 
+socket = require '../socket.coffee'
+
 template = require './card.ejs'
+explainTemplate = require './word_explain.ejs'
 
 class CardModel extends Backbone.Model
     defaults:
@@ -21,6 +24,7 @@ class Card extends Backbone.View
     className: 'card'
 
     events:
+        'blur .title': 'searchWord'
         'change input': 'updateModel'
         'change textarea': 'updateModel'
         'click .submit': 'submit'
@@ -33,6 +37,9 @@ class Card extends Backbone.View
 
         if options && options.title
             @fetch options.title
+
+        socket.on 'searched:word', (res) =>
+            @renderWordExplain res.data unless res.err
 
     render: ->
         @$el.html template(@model.toJSON())
@@ -68,5 +75,13 @@ class Card extends Backbone.View
                 unless res.message is 'ok'
                     return alert JSON.stringify(res.error)
                 window.location = "/#cards/#{res.data.title}"
+
+    searchWord: ->
+        title = @$('.title').val()
+        return unless title
+        socket.emit 'search:word', title
+
+    renderWordExplain: (data) ->
+        @$('.word-explain').html explainTemplate(data)
 
 module.exports = Card
