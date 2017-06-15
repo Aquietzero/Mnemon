@@ -82,6 +82,10 @@ class Card extends Backbone.View
         socket.emit 'search:word', title
 
     renderWordExplain: (data) ->
-        @$('.word-explain').html explainTemplate(data)
+        if data.explains and data.explains.length > 0
+            @$('.word-explain').html explainTemplate(data)
+            @$('.word-explain').addClass('show')
+        else
+            @$('.word-explain').removeClass('show')
 
 module.exports = Card

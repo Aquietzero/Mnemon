@@ -18253,7 +18253,12 @@
 	  };
 
 	  Card.prototype.renderWordExplain = function(data) {
-	    return this.$('.word-explain').html(explainTemplate(data));
+	    if (data.explains && data.explains.length > 0) {
+	      this.$('.word-explain').html(explainTemplate(data));
+	      return this.$('.word-explain').addClass('show');
+	    } else {
+	      return this.$('.word-explain').removeClass('show');
+	    }
 	  };
 
 	  return Card;
@@ -18298,7 +18303,7 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: -210px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n", ""]);
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n", ""]);
 
 	// exports
 
@@ -18346,17 +18351,19 @@
 	module.exports = function (data) {
 	var __t, __p = '', __j = Array.prototype.join;
 	function print() { __p += __j.call(arguments, '') }
-	__p += '<h3>' +
-	((__t = ( data.word )) == null ? '' : __t) +
-	'</h3>\n<p>' +
-	((__t = ( data.kana )) == null ? '' : __t) +
+
+	 data.explains.forEach(function (explain) { ;
+	__p += '\n  <div>\n    <h3>' +
+	((__t = ( explain.kana )) == null ? '' : __t) +
 	' ' +
-	((__t = ( data.tone )) == null ? '' : __t) +
-	'</p>\n';
-	 data.exp.split('\n').forEach(function (line) { ;
-	__p += '\n  <p>' +
+	((__t = ( explain.tone )) == null ? '' : __t) +
+	'</h3>\n    ';
+	 explain.content.split('\n').forEach(function (line) { ;
+	__p += '\n      <p>' +
 	((__t = ( line )) == null ? '' : __t) +
-	'</p>\n';
+	'</p>\n    ';
+	 }) ;
+	__p += '\n  </div>\n  <br>\n';
 	 }) ;
 	__p += '\n';
 	return __p

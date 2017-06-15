@@ -1,5 +1,9 @@
-<h3><%= data.word %></h3>
-<p><%= data.kana %> <%= data.tone %></p>
-<% data.exp.split('\n').forEach(function (line) { %>
-  <p><%= line %></p>
+<% data.explains.forEach(function (explain) { %>
+  <div>
+    <h3><%= explain.kana %> <%= explain.tone %></h3>
+    <% explain.content.split('\n').forEach(function (line) { %>
+      <p><%= line %></p>
+    <% }) %>
+  </div>
+  <br>
 <% }) %>

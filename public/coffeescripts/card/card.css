@@ -57,10 +57,11 @@
 
 .word-explain {
   position: absolute;
+  display: none;
   right: 0;
   top: 20px;
   width: 210px;
-  margin-right: -210px;
+  margin-right: 0px;
   border: solid 1px #999;
   padding: 20px;
   max-height: 400px;
@@ -68,4 +69,9 @@
   border-radius: 0 5px 5px 0;
   color: #999;
   font-size: 0.8em;
+}
+
+.word-explain.show {
+  display: block;
+  margin-right: -210px;
 }
