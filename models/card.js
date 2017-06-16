@@ -4,6 +4,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var CardSchema = new Schema({
+    // every card should belong to a deck.
+    deck: {
+        type: String,
+        default: 'default',
+        index: true,
+    },
+
     // e.g.: words, phrases, grammar points.
     title: {
         type: String,
@@ -32,6 +39,16 @@ var CardSchema = new Schema({
 
     // a string given some memory aids.
     memory_aids: String,
+
+    created_at: {
+        type: Date,
+        default: Date.new
+    },
+    updated_at: {
+        type: Date,
+        default: Date.new
+    },
 });
+
 
 module.exports = mnemonDb.model('Card', CardSchema, 'cards');

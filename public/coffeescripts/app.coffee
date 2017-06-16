@@ -8,7 +8,8 @@ Backbone = require 'backbone'
 Router = require './router.coffee'
 
 Dashboard = require './dashboard/dashboard.coffee'
-Card = require './card/card.coffee'
+CardView = require './card/card_view.coffee'
+CardsView = require './cards/cards_view.coffee'
 
 class App extends Backbone.View
     constructor: (options) ->
@@ -22,8 +23,11 @@ class App extends Backbone.View
         console.log "app: render #{page}, #{params}"
         switch page
             when 'card'
-                card = new Card(title: params[0])
+                card = new CardView(title: params[0])
                 @$('.content').html card.render().el
+            when 'cards'
+                cards = new CardsView()
+                @$('.content').html cards.render().el
             else @render()
 
         window.$('.selection.dropdown').dropdown()

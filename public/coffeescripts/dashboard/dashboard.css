@@ -1,3 +1,7 @@
 .dashboard {
   border-left: solid black 1px;
 }
+
+.container {
+  padding-left: 90px;
+}

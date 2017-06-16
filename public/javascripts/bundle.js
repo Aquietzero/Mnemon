@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, App, Backbone, Card, Dashboard, Router,
+	var $, App, Backbone, CardView, CardsView, Dashboard, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -60,7 +60,9 @@
 
 	Dashboard = __webpack_require__(21);
 
-	Card = __webpack_require__(26);
+	CardView = __webpack_require__(26);
+
+	CardsView = __webpack_require__(33);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -75,14 +77,18 @@
 	  };
 
 	  App.prototype.renderPage = function(page, params) {
-	    var card;
+	    var card, cards;
 	    console.log("app: render " + page + ", " + params);
 	    switch (page) {
 	      case 'card':
-	        card = new Card({
+	        card = new CardView({
 	          title: params[0]
 	        });
 	        this.$('.content').html(card.render().el);
+	        break;
+	      case 'cards':
+	        cards = new CardsView();
+	        this.$('.content').html(cards.render().el);
 	        break;
 	      default:
 	        this.render();
@@ -16452,7 +16458,8 @@
 
 	  Router.prototype.routes = {
 	    '': 'card',
-	    'cards(/:title)': 'card'
+	    'cards/detail(/:title)': 'card',
+	    'cards/list': 'cards'
 	  };
 
 	  function Router(opts) {
@@ -16467,6 +16474,10 @@
 
 	  Router.prototype.card = function() {
 	    return this.renderPage('card', arguments);
+	  };
+
+	  Router.prototype.cards = function() {
+	    return this.renderPage('cards', arguments);
 	  };
 
 	  return Router;
@@ -18105,7 +18116,7 @@
 
 
 	// module
-	exports.push([module.id, ".dashboard {\n  border-left: solid black 1px;\n}\n", ""]);
+	exports.push([module.id, ".dashboard {\n  border-left: solid black 1px;\n}\n\n.container {\n  padding-left: 90px;\n}\n", ""]);
 
 	// exports
 
@@ -18126,7 +18137,7 @@
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Card, CardModel, _, explainTemplate, socket, template,
+	var $, Backbone, Card, CardView, _, explainTemplate, socket, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -18144,42 +18155,24 @@
 
 	explainTemplate = __webpack_require__(31);
 
-	CardModel = (function(superClass) {
-	  extend(CardModel, superClass);
+	Card = __webpack_require__(32);
 
-	  function CardModel() {
-	    return CardModel.__super__.constructor.apply(this, arguments);
-	  }
+	CardView = (function(superClass) {
+	  extend(CardView, superClass);
 
-	  CardModel.prototype.defaults = {
-	    title: 'Word',
-	    sub_title: 'A basic unit to express something.',
-	    content: 'Words build sentences, which build a language.',
-	    tags: [],
-	    connections: [],
-	    memory_aids: 'What? It\'s a word.'
-	  };
+	  CardView.prototype.className = 'card';
 
-	  return CardModel;
-
-	})(Backbone.Model);
-
-	Card = (function(superClass) {
-	  extend(Card, superClass);
-
-	  Card.prototype.className = 'card';
-
-	  Card.prototype.events = {
+	  CardView.prototype.events = {
 	    'blur .title': 'searchWord',
 	    'change input': 'updateModel',
 	    'change textarea': 'updateModel',
 	    'click .submit': 'submit'
 	  };
 
-	  function Card(options) {
-	    Card.__super__.constructor.apply(this, arguments);
+	  function CardView(options) {
+	    CardView.__super__.constructor.apply(this, arguments);
 	    console.log('init card.');
-	    this.model = new CardModel();
+	    this.model = options.model || new Card();
 	    if (options && options.title) {
 	      this.fetch(options.title);
 	    }
@@ -18192,12 +18185,12 @@
 	    })(this));
 	  }
 
-	  Card.prototype.render = function() {
+	  CardView.prototype.render = function() {
 	    this.$el.html(template(this.model.toJSON()));
 	    return this;
 	  };
 
-	  Card.prototype.fetch = function(title) {
+	  CardView.prototype.fetch = function(title) {
 	    return $.ajax({
 	      url: '/cards/detail',
 	      data: {
@@ -18216,7 +18209,7 @@
 	    });
 	  };
 
-	  Card.prototype.updateModel = function(e) {
+	  CardView.prototype.updateModel = function(e) {
 	    var $input, key, val;
 	    $input = $(e.currentTarget);
 	    key = $input.attr('name');
@@ -18226,24 +18219,24 @@
 	    }
 	  };
 
-	  Card.prototype.submit = function() {
+	  CardView.prototype.submit = function() {
 	    console.log(this.model.toJSON());
 	    return $.ajax({
 	      url: '/cards/update',
-	      data: this.model.toJSON(),
+	      data: _.omit(this.model.toJSON(), '_id'),
 	      method: 'post',
 	      success: (function(_this) {
 	        return function(res) {
 	          if (res.message !== 'ok') {
 	            return alert(JSON.stringify(res.error));
 	          }
-	          return window.location = "/#cards/" + res.data.title;
+	          return window.location = "/#cards/detail/" + res.data.title;
 	        };
 	      })(this)
 	    });
 	  };
 
-	  Card.prototype.searchWord = function() {
+	  CardView.prototype.searchWord = function() {
 	    var title;
 	    title = this.$('.title').val();
 	    if (!title) {
@@ -18252,7 +18245,7 @@
 	    return socket.emit('search:word', title);
 	  };
 
-	  Card.prototype.renderWordExplain = function(data) {
+	  CardView.prototype.renderWordExplain = function(data) {
 	    if (data.explains && data.explains.length > 0) {
 	      this.$('.word-explain').html(explainTemplate(data));
 	      return this.$('.word-explain').addClass('show');
@@ -18261,11 +18254,11 @@
 	    }
 	  };
 
-	  return Card;
+	  return CardView;
 
 	})(Backbone.View);
 
-	module.exports = Card;
+	module.exports = CardView;
 
 
 /***/ },
@@ -18368,6 +18361,226 @@
 	__p += '\n';
 	return __p
 	}
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Backbone, Card,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	Backbone = __webpack_require__(18);
+
+	Card = (function(superClass) {
+	  extend(Card, superClass);
+
+	  function Card() {
+	    return Card.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Card.prototype.defaults = {
+	    title: 'Word',
+	    sub_title: 'A basic unit to express something.',
+	    content: 'Words build sentences, which build a language.',
+	    tags: [],
+	    connections: [],
+	    memory_aids: 'What? It\'s a word.'
+	  };
+
+	  return Card;
+
+	})(Backbone.Model);
+
+	module.exports = Card;
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, CardEntryView, Cards, CardsView, _, card_entry_template, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	__webpack_require__(34);
+
+	template = __webpack_require__(36);
+
+	card_entry_template = __webpack_require__(37);
+
+	Cards = __webpack_require__(38);
+
+	CardEntryView = (function(superClass) {
+	  extend(CardEntryView, superClass);
+
+	  function CardEntryView() {
+	    return CardEntryView.__super__.constructor.apply(this, arguments);
+	  }
+
+	  CardEntryView.prototype.className = 'item card-entry';
+
+	  CardEntryView.prototype.render = function() {
+	    this.$el.html(card_entry_template(this.model.toJSON()));
+	    return this;
+	  };
+
+	  return CardEntryView;
+
+	})(Backbone.View);
+
+	CardsView = (function(superClass) {
+	  extend(CardsView, superClass);
+
+	  CardsView.prototype.className = 'cards';
+
+	  function CardsView(options) {
+	    CardsView.__super__.constructor.apply(this, arguments);
+	    console.log('init cards.');
+	    this.query = {
+	      q: {},
+	      page: 0,
+	      limit: 20
+	    };
+	    this.collection = new Cards();
+	    this.listenTo(this.collection, 'add', this.renderCard);
+	    this.fetch();
+	  }
+
+	  CardsView.prototype.render = function() {
+	    this.$el.html(template());
+	    return this;
+	  };
+
+	  CardsView.prototype.fetch = function() {
+	    return $.ajax({
+	      url: '/cards',
+	      method: 'post',
+	      data: {
+	        query: this.query
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          console.log(res.data);
+	          return _this.collection.add(res.data);
+	        };
+	      })(this)
+	    });
+	  };
+
+	  CardsView.prototype.renderCard = function(card) {
+	    var cardEntry;
+	    console.log(card);
+	    cardEntry = new CardEntryView({
+	      model: card
+	    });
+	    return this.$('.search-results').append(cardEntry.render().el);
+	  };
+
+	  return CardsView;
+
+	})(Backbone.View);
+
+	module.exports = CardsView;
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(35);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./cards.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./cards.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<div class="ui grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search animals...">\n        <i class="search icon"></i>\n      </div>\n      <div class="search-results ui relaxed divided list"></div>\n    </div>\n\n    <hr>\n\n    <div class="cards">\n    </div>\n  </div>\n\n  <div class="eight wide column card-preview">\n  </div>\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<i class="large github middle aligned icon"></i>\n<div class="content">\n  <a class="header">' +
+	((__t = ( data.title )) == null ? '' : __t) +
+	'</a>\n  <div class="description">' +
+	((__t = ( data.sub_title )) == null ? '' : __t) +
+	'</div>\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Backbone, Card, Cards,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	Backbone = __webpack_require__(18);
+
+	Card = __webpack_require__(32);
+
+	Cards = (function(superClass) {
+	  extend(Cards, superClass);
+
+	  function Cards() {
+	    return Cards.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Cards.prototype.model = Card;
+
+	  return Cards;
+
+	})(Backbone.Collection);
+
+	module.exports = Cards;
+
 
 /***/ }
 /******/ ]);

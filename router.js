@@ -6,6 +6,7 @@ module.exports = function (app) {
     app.get('/', Routers.index.home);
 
     // Card
+    app.post('/cards', Routers.card.all);
     app.post('/cards/detail', Routers.card.detail);
     app.post('/cards/update', Routers.card.update);
 }

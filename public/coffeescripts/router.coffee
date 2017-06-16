@@ -3,7 +3,8 @@ Backbone = require 'backbone'
 class Router extends Backbone.Router
     routes:
         '': 'card'
-        'cards(/:title)': 'card'
+        'cards/detail(/:title)': 'card'
+        'cards/list': 'cards'
 
     constructor: (opts) ->
         super opts
@@ -14,6 +15,7 @@ class Router extends Backbone.Router
         @app.renderPage page, params
 
     card: -> @renderPage 'card', arguments
+    cards: -> @renderPage 'cards', arguments
 
 module.exports = Router
 
