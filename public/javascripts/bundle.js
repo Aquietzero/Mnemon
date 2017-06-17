@@ -18321,7 +18321,7 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n.card textarea {\n  min-height: 290px;\n  resize: none;\n}\n", ""]);
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
 
 	// exports
 
@@ -18372,7 +18372,9 @@
 	((__t = ( data.title )) == null ? '' : __t) +
 	'" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
-	'" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea id="" name="content">' +
+	'" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea class="explain" id="" name="explain">' +
+	((__t = ( data.explain )) == null ? '' : __t) +
+	'</textarea>\n</div>\n\n<div class="section">\n  <textarea class="content" id="" name="content">' +
 	((__t = ( data.content )) == null ? '' : __t) +
 	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" name="memory_aids" type="text" value="' +
 	((__t = ( data.memory_aids )) == null ? '' : __t) +
@@ -18433,7 +18435,8 @@
 	  Card.prototype.defaults = {
 	    deck: 'default',
 	    title: 'Word',
-	    sub_title: 'A basic unit to express something.',
+	    explain: 'A basic unit to express something.',
+	    sub_title: 'Noun',
 	    content: 'Words build sentences, which build a language.',
 	    tags: [],
 	    connections: [],
@@ -18669,7 +18672,7 @@
 	'</div>\n  <div class="description">' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
 	' <span class="word-content">' +
-	((__t = ( data.content.slice(0, 20) + '...' )) == null ? '' : __t) +
+	((__t = ( data.explain.slice(0, 20) + '...' )) == null ? '' : __t) +
 	'</span></div>\n\n  <!--\n  <div class="right floated content">\n    <i class="remove middle aligned icon remove-card"></i>\n  </div>\n  -->\n</div>\n';
 	return __p
 	}

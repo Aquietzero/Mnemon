@@ -25,6 +25,8 @@ Principles:
 + Auto connection suggestions while create or update cards.
 + Basic memory flow and statistics.
 
++ Keyword shortcuts to enhance the speed of creating cards.
+
 ## Leitner system
 
 A basic spacing repetition method used by anki droid for cards memorization.

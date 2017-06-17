@@ -20,10 +20,14 @@ var CardSchema = new Schema({
     },
 
     // e.g.: translation of title in different language.
-    sub_title: {
+    explain: {
         type: String,
         index: true,
         require: true,
+    },
+
+    sub_title: {
+        type: String,
     },
 
     // Supports markdown.

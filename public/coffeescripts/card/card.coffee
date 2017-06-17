@@ -6,7 +6,8 @@ class Card extends Backbone.Model
     defaults:
         deck: 'default'
         title: 'Word'
-        sub_title: 'A basic unit to express something.'
+        explain: 'A basic unit to express something.'
+        sub_title: 'Noun'
         content: 'Words build sentences, which build a language.'
         # tags: ['language', 'noun'],
         # connections: ['Sentence', 'Language'],

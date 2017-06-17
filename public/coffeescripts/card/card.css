@@ -26,6 +26,13 @@
 .card input:focus,
 .card textarea:focus {
   outline: none;
+  resize: none;
+}
+.card textarea.content {
+  min-height: 290px;
+}
+.card textarea.explain {
+  min-height: 30px;
 }
 
 .card .title {
@@ -37,6 +44,11 @@
 .card .sub-title {
   text-align: center;
   font-size: 1.2em;
+}
+
+.card .explain {
+  font-size: 1.1em;
+  text-align: center;
 }
 
 .card .content {
@@ -76,7 +88,3 @@
   margin-right: -210px;
 }
 
-.card textarea {
-  min-height: 290px;
-  resize: none;
-}
