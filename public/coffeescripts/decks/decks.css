@@ -1,0 +1,7 @@
+.add-a-deck .form {
+  margin: 20px 0;
+}
+
+.add-a-deck .form.hide {
+  display: none;
+}

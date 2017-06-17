@@ -10,6 +10,7 @@ Router = require './router.coffee'
 Dashboard = require './dashboard/dashboard.coffee'
 CardView = require './card/card_view.coffee'
 CardsView = require './cards/cards_view.coffee'
+DecksView = require './decks/decks_view.coffee'
 
 class App extends Backbone.View
     constructor: (options) ->
@@ -28,6 +29,9 @@ class App extends Backbone.View
             when 'cards'
                 cards = new CardsView()
                 @$('.content').html cards.render().el
+            when 'decks'
+                decks = new DecksView()
+                @$('.content').html decks.render().el
             else @render()
 
         window.$('.selection.dropdown').dropdown()

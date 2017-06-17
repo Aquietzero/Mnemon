@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, App, Backbone, CardView, CardsView, Dashboard, Router,
+	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -64,6 +64,8 @@
 
 	CardsView = __webpack_require__(33);
 
+	DecksView = __webpack_require__(39);
+
 	App = (function(superClass) {
 	  extend(App, superClass);
 
@@ -77,7 +79,7 @@
 	  };
 
 	  App.prototype.renderPage = function(page, params) {
-	    var card, cards;
+	    var card, cards, decks;
 	    console.log("app: render " + page + ", " + params);
 	    switch (page) {
 	      case 'card':
@@ -89,6 +91,10 @@
 	      case 'cards':
 	        cards = new CardsView();
 	        this.$('.content').html(cards.render().el);
+	        break;
+	      case 'decks':
+	        decks = new DecksView();
+	        this.$('.content').html(decks.render().el);
 	        break;
 	      default:
 	        this.render();
@@ -16457,9 +16463,10 @@
 	  extend(Router, superClass);
 
 	  Router.prototype.routes = {
-	    '': 'card',
+	    '': 'decks',
 	    'cards/detail(/:title)': 'card',
-	    'cards/list': 'cards'
+	    'cards/list': 'cards',
+	    'decks/list': 'decks'
 	  };
 
 	  function Router(opts) {
@@ -16478,6 +16485,10 @@
 
 	  Router.prototype.cards = function() {
 	    return this.renderPage('cards', arguments);
+	  };
+
+	  Router.prototype.decks = function() {
+	    return this.renderPage('decks', arguments);
 	  };
 
 	  return Router;
@@ -18615,6 +18626,220 @@
 
 	module.exports = Cards;
 
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, Deck, DeckEntryView, Decks, DecksView, _, deck_entry_template, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	__webpack_require__(40);
+
+	template = __webpack_require__(42);
+
+	deck_entry_template = __webpack_require__(43);
+
+	Deck = (function(superClass) {
+	  extend(Deck, superClass);
+
+	  function Deck() {
+	    return Deck.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Deck.prototype.defaults = {
+	    name: 'Default Deck',
+	    description: 'A default deck.'
+	  };
+
+	  return Deck;
+
+	})(Backbone.Model);
+
+	Decks = (function(superClass) {
+	  extend(Decks, superClass);
+
+	  function Decks() {
+	    return Decks.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Decks.prototype.model = Deck;
+
+	  return Decks;
+
+	})(Backbone.Collection);
+
+	DeckEntryView = (function(superClass) {
+	  extend(DeckEntryView, superClass);
+
+	  function DeckEntryView() {
+	    return DeckEntryView.__super__.constructor.apply(this, arguments);
+	  }
+
+	  DeckEntryView.prototype.className = 'item deck-entry';
+
+	  DeckEntryView.prototype.render = function() {
+	    this.$el.html(deck_entry_template(this.model.toJSON()));
+	    this.$el.attr('id', this.model.get('name'));
+	    return this;
+	  };
+
+	  return DeckEntryView;
+
+	})(Backbone.View);
+
+	DecksView = (function(superClass) {
+	  extend(DecksView, superClass);
+
+	  DecksView.prototype.className = 'decks';
+
+	  DecksView.prototype.events = {
+	    'click .add-a-deck .submit': 'addADeck',
+	    'click .toggle-add-a-deck': 'toggleAddADeck'
+	  };
+
+	  function DecksView(options) {
+	    DecksView.__super__.constructor.apply(this, arguments);
+	    console.log('init decks.');
+	    this.query = {
+	      q: {},
+	      page: 0,
+	      limit: 20
+	    };
+	    this.collection = new Decks();
+	    this.listenTo(this.collection, 'add', this.renderDeck);
+	    this.fetch();
+	  }
+
+	  DecksView.prototype.render = function() {
+	    this.$el.html(template());
+	    this.$('.cards-list').height($(window).height());
+	    return this;
+	  };
+
+	  DecksView.prototype.fetch = function() {
+	    return $.ajax({
+	      url: '/decks',
+	      method: 'post',
+	      data: {
+	        query: this.query
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          return _this.collection.add(res.data);
+	        };
+	      })(this)
+	    });
+	  };
+
+	  DecksView.prototype.renderDeck = function(deck) {
+	    var deckEntry;
+	    deckEntry = new DeckEntryView({
+	      model: deck
+	    });
+	    return this.$('.search-result').append(deckEntry.render().el);
+	  };
+
+	  DecksView.prototype.toggleAddADeck = function() {
+	    return this.$('.add-a-deck .form').toggleClass('hide');
+	  };
+
+	  DecksView.prototype.addADeck = function() {
+	    var description, name;
+	    name = this.$('input[name="name"]').val();
+	    description = this.$('input[name="description"]').val();
+	    return $.ajax({
+	      url: '/decks/update',
+	      method: 'post',
+	      data: {
+	        name: name,
+	        description: description
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          return _this.collection.unshift(res.data);
+	        };
+	      })(this)
+	    });
+	  };
+
+	  return DecksView;
+
+	})(Backbone.View);
+
+	module.exports = DecksView;
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(41);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./decks.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./decks.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, ".add-a-deck .form {\n  margin: 20px 0;\n}\n\n.add-a-deck .form.hide {\n  display: none;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<div class="ui padded grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column deck-preview">\n  </div>\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<i class="empty star middle aligned icon"></i>\n<div class="content">\n  <div class="header">' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'</div>\n  <div class="description">' +
+	((__t = ( data.description )) == null ? '' : __t) +
+	'</div>\n</div>\n';
+	return __p
+	}
 
 /***/ }
 /******/ ]);
