@@ -67,6 +67,7 @@ class CardView extends Backbone.View
 
     searchWord: ->
         title = @$('.title').val()
+        console.log(title)
         return unless title
         socket.emit 'search:word', title
 

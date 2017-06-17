@@ -1,0 +1,22 @@
+
+.cards-list {
+  min-height: 100%;
+  border-right: solid 1px #999;
+  overflow: scroll;
+}
+
+.cards-list .search-delimiter {
+  margin: 14px 0;
+}
+
+.cards-list .search-result {
+  margin-top: 14px;
+}
+
+.card-entry .description {
+  font-size: 0.8em;
+}
+
+.card-entry .word-content {
+  color: #999;
+}

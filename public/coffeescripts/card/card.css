@@ -75,3 +75,8 @@
   display: block;
   margin-right: -210px;
 }
+
+.card textarea {
+  min-height: 290px;
+  resize: none;
+}

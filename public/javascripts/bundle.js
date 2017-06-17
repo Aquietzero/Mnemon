@@ -18239,6 +18239,7 @@
 	  CardView.prototype.searchWord = function() {
 	    var title;
 	    title = this.$('.title').val();
+	    console.log(title);
 	    if (!title) {
 	      return;
 	    }
@@ -18296,7 +18297,7 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n", ""]);
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n.card textarea {\n  min-height: 290px;\n  resize: none;\n}\n", ""]);
 
 	// exports
 
@@ -18321,7 +18322,7 @@
 	function print() { __p += __j.call(arguments, '') }
 	__p += '<div class="section">\n  <input class="title" name="title" type="text" value="' +
 	((__t = ( data.title )) == null ? '' : __t) +
-	'" />\n  <input class="sub-title" name="sub-title" type="text" value="' +
+	'" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
 	'" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea id="" name="content">' +
 	((__t = ( data.content )) == null ? '' : __t) +
@@ -18399,7 +18400,7 @@
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, CardEntryView, Cards, CardsView, _, card_entry_template, template,
+	var $, Backbone, CardEntryView, CardView, Cards, CardsView, _, card_entry_template, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -18417,6 +18418,8 @@
 
 	Cards = __webpack_require__(38);
 
+	CardView = __webpack_require__(26);
+
 	CardEntryView = (function(superClass) {
 	  extend(CardEntryView, superClass);
 
@@ -18428,7 +18431,12 @@
 
 	  CardEntryView.prototype.render = function() {
 	    this.$el.html(card_entry_template(this.model.toJSON()));
+	    this.$el.attr('id', this.model.get('title'));
 	    return this;
+	  };
+
+	  CardEntryView.prototype.showPreview = function() {
+	    return this.emit('show:preview', this);
 	  };
 
 	  return CardEntryView;
@@ -18440,6 +18448,10 @@
 
 	  CardsView.prototype.className = 'cards';
 
+	  CardsView.prototype.events = {
+	    'click .card-entry': 'preview'
+	  };
+
 	  function CardsView(options) {
 	    CardsView.__super__.constructor.apply(this, arguments);
 	    console.log('init cards.');
@@ -18450,11 +18462,13 @@
 	    };
 	    this.collection = new Cards();
 	    this.listenTo(this.collection, 'add', this.renderCard);
+	    this.cardPreview;
 	    this.fetch();
 	  }
 
 	  CardsView.prototype.render = function() {
 	    this.$el.html(template());
+	    this.$('.cards-list').height($(window).height());
 	    return this;
 	  };
 
@@ -18467,8 +18481,10 @@
 	      },
 	      success: (function(_this) {
 	        return function(res) {
-	          console.log(res.data);
-	          return _this.collection.add(res.data);
+	          _this.collection.add(res.data);
+	          if (!_this.cardPreview) {
+	            return _this.$('.card-entry').click();
+	          }
 	        };
 	      })(this)
 	    });
@@ -18476,11 +18492,27 @@
 
 	  CardsView.prototype.renderCard = function(card) {
 	    var cardEntry;
-	    console.log(card);
 	    cardEntry = new CardEntryView({
 	      model: card
 	    });
-	    return this.$('.search-results').append(cardEntry.render().el);
+	    return this.$('.search-result').append(cardEntry.render().el);
+	  };
+
+	  CardsView.prototype.preview = function(e) {
+	    var $cardEntry, card, cardView, title;
+	    if (this.cardPreview) {
+	      this.cardPreview.remove();
+	      delete this.cardPreview;
+	    }
+	    $cardEntry = this.$(e.currentTarget);
+	    title = $cardEntry.attr('id');
+	    card = this.collection.findWhere({
+	      title: title
+	    });
+	    this.cardPreview = cardView = new CardView({
+	      model: card
+	    });
+	    return this.$('.card-preview').html(cardView.render().el);
 	  };
 
 	  return CardsView;
@@ -18525,7 +18557,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, "\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n", ""]);
 
 	// exports
 
@@ -18536,7 +18568,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search animals...">\n        <i class="search icon"></i>\n      </div>\n      <div class="search-results ui relaxed divided list"></div>\n    </div>\n\n    <hr>\n\n    <div class="cards">\n    </div>\n  </div>\n\n  <div class="eight wide column card-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="単語を探す...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column card-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
@@ -18546,11 +18578,13 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<i class="large github middle aligned icon"></i>\n<div class="content">\n  <a class="header">' +
+	__p += '<i class="empty star middle aligned icon"></i>\n<div class="content">\n  <div class="header">' +
 	((__t = ( data.title )) == null ? '' : __t) +
-	'</a>\n  <div class="description">' +
+	'</div>\n  <div class="description">' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
-	'</div>\n</div>\n';
+	' <span class="word-content">' +
+	((__t = ( data.content.slice(0, 20) + '...' )) == null ? '' : __t) +
+	'</span></div>\n</div>\n';
 	return __p
 	}
 

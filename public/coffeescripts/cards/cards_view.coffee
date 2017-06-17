@@ -6,16 +6,24 @@ require './cards.css'
 template = require './cards.ejs'
 card_entry_template = require './card_entry.ejs'
 Cards = require './cards.coffee'
+CardView = require '../card/card_view.coffee'
 
 class CardEntryView extends Backbone.View
     className: 'item card-entry'
 
     render: ->
         @$el.html card_entry_template(@model.toJSON())
+        @$el.attr 'id', @model.get('title')
         @
+
+    showPreview: ->
+        @emit 'show:preview', @
 
 class CardsView extends Backbone.View
     className: 'cards'
+
+    events:
+        'click .card-entry': 'preview'
 
     constructor: (options) ->
         super
@@ -27,11 +35,13 @@ class CardsView extends Backbone.View
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
+        @cardPreview
 
         @fetch()
 
     render: ->
         @$el.html template()
+        @$('.cards-list').height $(window).height()
         @
 
     fetch: ->
@@ -41,13 +51,25 @@ class CardsView extends Backbone.View
             data:
                 query: @query
             success: (res) =>
-                console.log res.data
                 @collection.add res.data
 
+                unless @cardPreview
+                    @$('.card-entry').click()
+
     renderCard: (card) ->
-        console.log card
         cardEntry = new CardEntryView(model: card)
-        @$('.search-results').append cardEntry.render().el
+        @$('.search-result').append cardEntry.render().el
+
+    preview: (e) ->
+        if @cardPreview
+            @cardPreview.remove()
+            delete @cardPreview
+
+        $cardEntry = @$(e.currentTarget)
+        title = $cardEntry.attr 'id'
+        card = @collection.findWhere title: title
+        @cardPreview = cardView = new CardView(model: card)
+        @$('.card-preview').html cardView.render().el
 
 
 module.exports = CardsView
