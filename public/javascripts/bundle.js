@@ -62,9 +62,9 @@
 
 	CardView = __webpack_require__(26);
 
-	CardsView = __webpack_require__(33);
+	CardsView = __webpack_require__(34);
 
-	DecksView = __webpack_require__(39);
+	DecksView = __webpack_require__(40);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -18155,7 +18155,7 @@
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Card, CardView, _, explainTemplate, socket, template,
+	var $, Backbone, Card, CardView, _, event, explainTemplate, socket, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -18167,13 +18167,15 @@
 
 	__webpack_require__(27);
 
-	socket = __webpack_require__(29);
+	event = __webpack_require__(29);
 
-	template = __webpack_require__(30);
+	socket = __webpack_require__(30);
 
-	explainTemplate = __webpack_require__(31);
+	template = __webpack_require__(31);
 
-	Card = __webpack_require__(32);
+	explainTemplate = __webpack_require__(32);
+
+	Card = __webpack_require__(33);
 
 	CardView = (function(superClass) {
 	  extend(CardView, superClass);
@@ -18188,9 +18190,14 @@
 	  };
 
 	  function CardView(options) {
+	    if (options == null) {
+	      options = {
+	        model: new Card()
+	      };
+	    }
 	    CardView.__super__.constructor.apply(this, arguments);
 	    console.log('init card.');
-	    this.model = options.model || new Card();
+	    this.model = options.model;
 	    if (options && options.title) {
 	      this.fetch(options.title);
 	    }
@@ -18248,7 +18255,7 @@
 	          if (res.message !== 'ok') {
 	            return alert(JSON.stringify(res.error));
 	          }
-	          return window.location = "/#cards/detail/" + res.data.title;
+	          return event.trigger('card:create', new Card(res.data));
 	        };
 	      })(this)
 	    });
@@ -18315,13 +18322,37 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px auto;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n.card textarea {\n  min-height: 290px;\n  resize: none;\n}\n", ""]);
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n.card textarea {\n  min-height: 290px;\n  resize: none;\n}\n", ""]);
 
 	// exports
 
 
 /***/ },
 /* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Backbone, Event,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	Backbone = __webpack_require__(18);
+
+	Event = (function(superClass) {
+	  extend(Event, superClass);
+
+	  function Event() {
+	    return Event.__super__.constructor.apply(this, arguments);
+	  }
+
+	  return Event;
+
+	})(Backbone.Events);
+
+	module.exports = Event;
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports) {
 
 	var socket;
@@ -18332,7 +18363,7 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -18357,7 +18388,7 @@
 	}
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -18382,7 +18413,7 @@
 	}
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Card,
@@ -18399,6 +18430,7 @@
 	  }
 
 	  Card.prototype.defaults = {
+	    deck: 'default',
 	    title: 'Word',
 	    sub_title: 'A basic unit to express something.',
 	    content: 'Words build sentences, which build a language.',
@@ -18415,12 +18447,13 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, CardEntryView, CardView, Cards, CardsView, _, card_entry_template, template,
+	var $, Backbone, Card, CardEntryView, CardView, Cards, CardsView, _, card_entry_template, event, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
+	  hasProp = {}.hasOwnProperty,
+	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 	$ = __webpack_require__(1);
 
@@ -18428,13 +18461,17 @@
 
 	Backbone = __webpack_require__(18);
 
-	__webpack_require__(34);
+	__webpack_require__(35);
 
-	template = __webpack_require__(36);
+	event = __webpack_require__(29);
 
-	card_entry_template = __webpack_require__(37);
+	template = __webpack_require__(37);
 
-	Cards = __webpack_require__(38);
+	card_entry_template = __webpack_require__(38);
+
+	Cards = __webpack_require__(39);
+
+	Card = __webpack_require__(33);
 
 	CardView = __webpack_require__(26);
 
@@ -18467,19 +18504,19 @@
 	  CardsView.prototype.className = 'cards';
 
 	  CardsView.prototype.events = {
-	    'click .card-entry': 'preview'
+	    'click .card-entry': 'preview',
+	    'click .add-a-word': 'addAWord'
 	  };
 
 	  function CardsView(options) {
+	    this.renderCard = bind(this.renderCard, this);
 	    var q;
 	    CardsView.__super__.constructor.apply(this, arguments);
 	    console.log('init cards.');
+	    this.deck = (options != null ? options.deck : void 0) || 'default';
 	    q = {
-	      deck: 'default'
+	      deck: this.deck
 	    };
-	    if (options.deck) {
-	      q.deck = options.deck;
-	    }
 	    this.query = {
 	      q: q,
 	      page: 0,
@@ -18488,6 +18525,7 @@
 	    };
 	    this.collection = new Cards();
 	    this.listenTo(this.collection, 'add', this.renderCard);
+	    event.on('card:create', this.renderCard);
 	    this.cardPreview;
 	    this.fetch();
 	  }
@@ -18542,6 +18580,21 @@
 	    return this.$('.card-preview').html(cardView.render().el);
 	  };
 
+	  CardsView.prototype.addAWord = function() {
+	    var card, cardView;
+	    if (this.cardPreview) {
+	      this.cardPreview.remove();
+	      delete this.cardPreview;
+	    }
+	    card = new Card({
+	      deck: this.deck
+	    });
+	    this.cardPreview = cardView = new CardView({
+	      model: card
+	    });
+	    return this.$('.card-preview').html(cardView.render().el);
+	  };
+
 	  return CardsView;
 
 	})(Backbone.View);
@@ -18550,13 +18603,13 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(35);
+	var content = __webpack_require__(36);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -18576,7 +18629,7 @@
 	}
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -18590,17 +18643,17 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="単語を探す...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column card-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for words...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <button class="ui secondary button add-a-word">Add a word</button>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -18616,7 +18669,7 @@
 	}
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Card, Cards,
@@ -18625,7 +18678,7 @@
 
 	Backbone = __webpack_require__(18);
 
-	Card = __webpack_require__(32);
+	Card = __webpack_require__(33);
 
 	Cards = (function(superClass) {
 	  extend(Cards, superClass);
@@ -18644,7 +18697,7 @@
 
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Deck, DeckEntryView, Decks, DecksView, _, deck_entry_template, template,
@@ -18657,11 +18710,11 @@
 
 	Backbone = __webpack_require__(18);
 
-	__webpack_require__(40);
+	__webpack_require__(41);
 
-	template = __webpack_require__(42);
+	template = __webpack_require__(43);
 
-	deck_entry_template = __webpack_require__(43);
+	deck_entry_template = __webpack_require__(44);
 
 	Deck = (function(superClass) {
 	  extend(Deck, superClass);
@@ -18802,13 +18855,13 @@
 
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(41);
+	var content = __webpack_require__(42);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -18828,7 +18881,7 @@
 	}
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -18842,7 +18895,7 @@
 
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -18852,7 +18905,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {

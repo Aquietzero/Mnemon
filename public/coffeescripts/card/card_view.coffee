@@ -3,6 +3,7 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 require './card.css'
 
+event = require '../event.coffee'
 socket = require '../socket.coffee'
 
 template = require './card.ejs'
@@ -18,12 +19,11 @@ class CardView extends Backbone.View
         'change textarea': 'updateModel'
         'click .submit': 'submit'
 
-    constructor: (options) ->
+    constructor: (options = model: new Card()) ->
         super
         console.log 'init card.'
 
-        @model = options.model || new Card()
-
+        @model = options.model
         if options && options.title
             @fetch options.title
 
@@ -63,7 +63,8 @@ class CardView extends Backbone.View
             success: (res) =>
                 unless res.message is 'ok'
                     return alert JSON.stringify(res.error)
-                window.location = "/#cards/detail/#{res.data.title}"
+                event.trigger 'card:create', new Card(res.data)
+                # window.location = "/#cards/detail/#{res.data.title}"
 
     searchWord: ->
         title = @$('.title').val()

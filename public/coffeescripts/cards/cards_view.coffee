@@ -3,9 +3,13 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 require './cards.css'
 
+event = require '../event.coffee'
+
 template = require './cards.ejs'
 card_entry_template = require './card_entry.ejs'
 Cards = require './cards.coffee'
+
+Card = require '../card/card.coffee'
 CardView = require '../card/card_view.coffee'
 
 class CardEntryView extends Backbone.View
@@ -24,13 +28,14 @@ class CardsView extends Backbone.View
 
     events:
         'click .card-entry': 'preview'
+        'click .add-a-word': 'addAWord'
 
     constructor: (options) ->
         super
         console.log 'init cards.'
 
-        q = deck: 'default'
-        q.deck = options.deck if options.deck
+        @deck = options?.deck || 'default'
+        q = deck: @deck
 
         @query =
             q: q
@@ -39,6 +44,7 @@ class CardsView extends Backbone.View
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
+        event.on 'card:create', @renderCard
         @cardPreview
 
         @fetch()
@@ -60,7 +66,7 @@ class CardsView extends Backbone.View
                 unless @cardPreview
                     @$('.card-entry').click()
 
-    renderCard: (card) ->
+    renderCard: (card) =>
         cardEntry = new CardEntryView(model: card)
         @$('.search-result').append cardEntry.render().el
 
@@ -72,6 +78,15 @@ class CardsView extends Backbone.View
         $cardEntry = @$(e.currentTarget)
         title = $cardEntry.attr 'id'
         card = @collection.findWhere title: title
+        @cardPreview = cardView = new CardView(model: card)
+        @$('.card-preview').html cardView.render().el
+
+    addAWord: ->
+        if @cardPreview
+            @cardPreview.remove()
+            delete @cardPreview
+
+        card = new Card(deck: @deck)
         @cardPreview = cardView = new CardView(model: card)
         @$('.card-preview').html cardView.render().el
 
