@@ -4,8 +4,9 @@ class Router extends Backbone.Router
     routes:
         '': 'decks'
         'cards/detail(/:title)': 'card'
-        'cards/list': 'cards'
+        'cards/list': 'cards' # View all cards.
         'decks/list': 'decks'
+        'decks/:deck/cards': 'cards' # View cards in a deck.
 
     constructor: (opts) ->
         super opts

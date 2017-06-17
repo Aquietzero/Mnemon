@@ -71,6 +71,7 @@
 
 	  function App(options) {
 	    App.__super__.constructor.call(this, options);
+	    this.currentPage;
 	    this.dashboard = new Dashboard();
 	  }
 
@@ -79,22 +80,27 @@
 	  };
 
 	  App.prototype.renderPage = function(page, params) {
-	    var card, cards, decks;
+	    if (this.currentPage) {
+	      this.currentPage.remove();
+	      delete this.currentPage;
+	    }
 	    console.log("app: render " + page + ", " + params);
 	    switch (page) {
 	      case 'card':
-	        card = new CardView({
+	        this.currentPage = new CardView({
 	          title: params[0]
 	        });
-	        this.$('.content').html(card.render().el);
+	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      case 'cards':
-	        cards = new CardsView();
-	        this.$('.content').html(cards.render().el);
+	        this.currentPage = new CardsView({
+	          deck: params[0]
+	        });
+	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      case 'decks':
-	        decks = new DecksView();
-	        this.$('.content').html(decks.render().el);
+	        this.currentPage = new DecksView();
+	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      default:
 	        this.render();
@@ -16466,7 +16472,8 @@
 	    '': 'decks',
 	    'cards/detail(/:title)': 'card',
 	    'cards/list': 'cards',
-	    'decks/list': 'decks'
+	    'decks/list': 'decks',
+	    'decks/:deck/cards': 'cards'
 	  };
 
 	  function Router(opts) {
@@ -18464,11 +18471,19 @@
 	  };
 
 	  function CardsView(options) {
+	    var q;
 	    CardsView.__super__.constructor.apply(this, arguments);
 	    console.log('init cards.');
+	    q = {
+	      deck: 'default'
+	    };
+	    if (options.deck) {
+	      q.deck = options.deck;
+	    }
 	    this.query = {
-	      q: {},
+	      q: q,
 	      page: 0,
+	      skip: 0,
 	      limit: 20
 	    };
 	    this.collection = new Cards();
@@ -18484,11 +18499,12 @@
 	  };
 
 	  CardsView.prototype.fetch = function() {
+	    console.log(this.query);
 	    return $.ajax({
 	      url: '/cards',
 	      method: 'post',
 	      data: {
-	        query: this.query
+	        query: JSON.stringify(this.query)
 	      },
 	      success: (function(_this) {
 	        return function(res) {
@@ -18685,10 +18701,18 @@
 
 	  DeckEntryView.prototype.className = 'item deck-entry';
 
+	  DeckEntryView.prototype.events = {
+	    'click': 'toDeckCards'
+	  };
+
 	  DeckEntryView.prototype.render = function() {
 	    this.$el.html(deck_entry_template(this.model.toJSON()));
 	    this.$el.attr('id', this.model.get('name'));
 	    return this;
+	  };
+
+	  DeckEntryView.prototype.toDeckCards = function() {
+	    return window.location = "/#decks/" + (this.model.get('name')) + "/cards";
 	  };
 
 	  return DeckEntryView;

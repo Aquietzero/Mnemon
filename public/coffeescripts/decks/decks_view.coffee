@@ -17,10 +17,16 @@ class Decks extends Backbone.Collection
 class DeckEntryView extends Backbone.View
     className: 'item deck-entry'
 
+    events:
+        'click': 'toDeckCards'
+
     render: ->
         @$el.html deck_entry_template(@model.toJSON())
         @$el.attr 'id', @model.get('name')
         @
+
+    toDeckCards: ->
+        window.location = "/#decks/#{@model.get 'name'}/cards"
 
 
 class DecksView extends Backbone.View

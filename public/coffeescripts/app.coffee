@@ -15,23 +15,28 @@ DecksView = require './decks/decks_view.coffee'
 class App extends Backbone.View
     constructor: (options) ->
         super options
+        @currentPage
         @dashboard = new Dashboard()
 
     render: ->
         @$('.content').html @dashboard.render().el
 
     renderPage: (page, params) ->
+        if @currentPage
+            @currentPage.remove()
+            delete @currentPage
+
         console.log "app: render #{page}, #{params}"
         switch page
             when 'card'
-                card = new CardView(title: params[0])
-                @$('.content').html card.render().el
+                @currentPage = new CardView(title: params[0])
+                @$('.content').html @currentPage.render().el
             when 'cards'
-                cards = new CardsView()
-                @$('.content').html cards.render().el
+                @currentPage = new CardsView(deck: params[0])
+                @$('.content').html @currentPage.render().el
             when 'decks'
-                decks = new DecksView()
-                @$('.content').html decks.render().el
+                @currentPage = new DecksView()
+                @$('.content').html @currentPage.render().el
             else @render()
 
         window.$('.selection.dropdown').dropdown()

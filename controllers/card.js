@@ -5,8 +5,9 @@ var Model = require('../model');
 module.exports = function (app) {
     return {
         all: function (req, res) {
-            var defaultQ = {q: {}, limit: 20, skip: 0};
-            var query = _.extend(defaultQ, req.body.query || {});
+            console.log(req.body);
+            var defaultQ = {limit: 20, skip: 0};
+            var query = _.extend(defaultQ, JSON.parse(req.body.query) || {});
 
             Model.card
             .find(query.q)

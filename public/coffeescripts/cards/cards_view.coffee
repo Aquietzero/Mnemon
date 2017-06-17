@@ -29,9 +29,13 @@ class CardsView extends Backbone.View
         super
         console.log 'init cards.'
 
+        q = deck: 'default'
+        q.deck = options.deck if options.deck
+
         @query =
-            q: {}
+            q: q
             page: 0
+            skip: 0
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
@@ -45,11 +49,11 @@ class CardsView extends Backbone.View
         @
 
     fetch: ->
+        console.log @query
         $.ajax
             url: '/cards'
             method: 'post'
-            data:
-                query: @query
+            data: query: JSON.stringify @query
             success: (res) =>
                 @collection.add res.data
 
