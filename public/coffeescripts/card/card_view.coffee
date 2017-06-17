@@ -18,6 +18,7 @@ class CardView extends Backbone.View
         'change input': 'updateModel'
         'change textarea': 'updateModel'
         'click .submit': 'submit'
+        'click .autofill': 'autoFillCard'
 
     constructor: (options = model: new Card()) ->
         super
@@ -28,7 +29,10 @@ class CardView extends Backbone.View
             @fetch options.title
 
         socket.on 'searched:word', (res) =>
-            @renderWordExplain res.data unless res.err
+            unless res.err
+                @wordExplain = res.data
+                @renderWordExplain res.data
+        @listenTo @model, 'change', @render.bind(@)
 
     render: ->
         @$el.html template(@model.toJSON())
@@ -76,5 +80,31 @@ class CardView extends Backbone.View
             @$('.word-explain').addClass('show')
         else
             @$('.word-explain').removeClass('show')
+
+    autoFillCard: ->
+        console.log 'we', @wordExplain
+
+        return unless @wordExplain or @wordExplain.explains
+
+        explains = @wordExplain.explains
+        @model.set 'sub_title', "#{explains[0].kana}#{explains[0].tone}"
+
+        # '2. 禁，戒，戒除。〔禁止する〕。たばこを戒める。戒烟。'
+        # extract '禁，戒，戒除' from the above sentence. the leading '2' is
+        # no necessarily a number.
+        briefExplainRe = /\.\s+(.*?)。/g
+        briefExplains = _.compact(_.flatten(_.map @wordExplain.explains, (e) ->
+            results = []
+            r = briefExplainRe.exec e.content
+            while r
+                results.push r[1]
+                r = briefExplainRe.exec e.content
+            _.compact results
+        ))
+
+        @model.set 'explain', briefExplains.join('\n')
+        @model.set 'content', _.pluck(explains, 'content').join('\\\n\\\n')
+
+        console.log @model.toJSON()
 
 module.exports = CardView

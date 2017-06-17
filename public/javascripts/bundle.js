@@ -18186,7 +18186,8 @@
 	    'blur .title': 'searchWord',
 	    'change input': 'updateModel',
 	    'change textarea': 'updateModel',
-	    'click .submit': 'submit'
+	    'click .submit': 'submit',
+	    'click .autofill': 'autoFillCard'
 	  };
 
 	  function CardView(options) {
@@ -18204,10 +18205,12 @@
 	    socket.on('searched:word', (function(_this) {
 	      return function(res) {
 	        if (!res.err) {
+	          _this.wordExplain = res.data;
 	          return _this.renderWordExplain(res.data);
 	        }
 	      };
 	    })(this));
+	    this.listenTo(this.model, 'change', this.render.bind(this));
 	  }
 
 	  CardView.prototype.render = function() {
@@ -18277,6 +18280,30 @@
 	    } else {
 	      return this.$('.word-explain').removeClass('show');
 	    }
+	  };
+
+	  CardView.prototype.autoFillCard = function() {
+	    var briefExplainRe, briefExplains, explains;
+	    console.log('we', this.wordExplain);
+	    if (!(this.wordExplain || this.wordExplain.explains)) {
+	      return;
+	    }
+	    explains = this.wordExplain.explains;
+	    this.model.set('sub_title', "" + explains[0].kana + explains[0].tone);
+	    briefExplainRe = /\.\s+(.*?)。/g;
+	    briefExplains = _.compact(_.flatten(_.map(this.wordExplain.explains, function(e) {
+	      var r, results;
+	      results = [];
+	      r = briefExplainRe.exec(e.content);
+	      while (r) {
+	        results.push(r[1]);
+	        r = briefExplainRe.exec(e.content);
+	      }
+	      return _.compact(results);
+	    })));
+	    this.model.set('explain', briefExplains.join('\n'));
+	    this.model.set('content', _.pluck(explains, 'content').join('\\\n\\\n'));
+	    return console.log(this.model.toJSON());
 	  };
 
 	  return CardView;
@@ -18368,7 +18395,7 @@
 	module.exports = function (data) {
 	var __t, __p = '', __j = Array.prototype.join;
 	function print() { __p += __j.call(arguments, '') }
-	__p += '<div class="section">\n  <input class="title" name="title" type="text" value="' +
+	__p += '<div class="section">\n  <div class="right floated content autofill">\n    <i class="camera retro middle aligned icon remove-card"></i>\n  </div>\n  <input class="title" name="title" type="text" value="' +
 	((__t = ( data.title )) == null ? '' : __t) +
 	'" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
