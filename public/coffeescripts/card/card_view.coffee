@@ -54,8 +54,6 @@ class CardView extends Backbone.View
             @model.set key, val
 
     submit: ->
-        console.log @model.toJSON()
-
         $.ajax
             url: '/cards/update'
             data: _.omit(@model.toJSON(), '_id')

@@ -13,10 +13,22 @@
   margin-top: 14px;
 }
 
+.card-entry {
+  cursor: pointer;
+  padding-left: 10px !important;
+}
+
 .card-entry .description {
   font-size: 0.8em;
 }
 
 .card-entry .word-content {
   color: #999;
+}
+
+.card-entry:hover {
+  background: #eee;
+}
+.card-entry.active {
+  background: #e5e5e5;
 }

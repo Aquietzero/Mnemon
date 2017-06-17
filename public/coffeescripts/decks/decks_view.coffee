@@ -10,6 +10,7 @@ class Deck extends Backbone.Model
     defaults:
         name: 'Default Deck'
         description: 'A default deck.'
+        number_of_cards: 0
 
 class Decks extends Backbone.Collection
     model: Deck

@@ -28,7 +28,7 @@ class CardsView extends Backbone.View
 
     events:
         'click .card-entry': 'preview'
-        'click .add-a-word': 'addAWord'
+        'click .add-a-card': 'addACard'
 
     constructor: (options) ->
         super
@@ -44,7 +44,7 @@ class CardsView extends Backbone.View
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
-        event.on 'card:create', @renderCard
+        event.on 'card:create', (c) => @collection.add c
         @cardPreview
 
         @fetch()
@@ -55,7 +55,6 @@ class CardsView extends Backbone.View
         @
 
     fetch: ->
-        console.log @query
         $.ajax
             url: '/cards'
             method: 'post'
@@ -64,7 +63,7 @@ class CardsView extends Backbone.View
                 @collection.add res.data
 
                 unless @cardPreview
-                    @$('.card-entry').click()
+                    @$('.card-entry:first-child').click()
 
     renderCard: (card) =>
         cardEntry = new CardEntryView(model: card)
@@ -75,13 +74,16 @@ class CardsView extends Backbone.View
             @cardPreview.remove()
             delete @cardPreview
 
+        @$('.card-entry').removeClass 'active'
         $cardEntry = @$(e.currentTarget)
+        $cardEntry.addClass 'active'
+
         title = $cardEntry.attr 'id'
         card = @collection.findWhere title: title
         @cardPreview = cardView = new CardView(model: card)
         @$('.card-preview').html cardView.render().el
 
-    addAWord: ->
+    addACard: ->
         if @cardPreview
             @cardPreview.remove()
             delete @cardPreview

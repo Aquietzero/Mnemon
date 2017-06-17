@@ -18245,7 +18245,6 @@
 	  };
 
 	  CardView.prototype.submit = function() {
-	    console.log(this.model.toJSON());
 	    return $.ajax({
 	      url: '/cards/update',
 	      data: _.omit(this.model.toJSON(), '_id'),
@@ -18429,6 +18428,8 @@
 	    return Card.__super__.constructor.apply(this, arguments);
 	  }
 
+	  Card.prototype.idAttribute = '_id';
+
 	  Card.prototype.defaults = {
 	    deck: 'default',
 	    title: 'Word',
@@ -18505,7 +18506,7 @@
 
 	  CardsView.prototype.events = {
 	    'click .card-entry': 'preview',
-	    'click .add-a-word': 'addAWord'
+	    'click .add-a-card': 'addACard'
 	  };
 
 	  function CardsView(options) {
@@ -18525,7 +18526,11 @@
 	    };
 	    this.collection = new Cards();
 	    this.listenTo(this.collection, 'add', this.renderCard);
-	    event.on('card:create', this.renderCard);
+	    event.on('card:create', (function(_this) {
+	      return function(c) {
+	        return _this.collection.add(c);
+	      };
+	    })(this));
 	    this.cardPreview;
 	    this.fetch();
 	  }
@@ -18537,7 +18542,6 @@
 	  };
 
 	  CardsView.prototype.fetch = function() {
-	    console.log(this.query);
 	    return $.ajax({
 	      url: '/cards',
 	      method: 'post',
@@ -18548,7 +18552,7 @@
 	        return function(res) {
 	          _this.collection.add(res.data);
 	          if (!_this.cardPreview) {
-	            return _this.$('.card-entry').click();
+	            return _this.$('.card-entry:first-child').click();
 	          }
 	        };
 	      })(this)
@@ -18569,7 +18573,9 @@
 	      this.cardPreview.remove();
 	      delete this.cardPreview;
 	    }
+	    this.$('.card-entry').removeClass('active');
 	    $cardEntry = this.$(e.currentTarget);
+	    $cardEntry.addClass('active');
 	    title = $cardEntry.attr('id');
 	    card = this.collection.findWhere({
 	      title: title
@@ -18580,7 +18586,7 @@
 	    return this.$('.card-preview').html(cardView.render().el);
 	  };
 
-	  CardsView.prototype.addAWord = function() {
+	  CardsView.prototype.addACard = function() {
 	    var card, cardView;
 	    if (this.cardPreview) {
 	      this.cardPreview.remove();
@@ -18637,7 +18643,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n", ""]);
+	exports.push([module.id, "\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
 
 	// exports
 
@@ -18648,7 +18654,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for words...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <button class="ui secondary button add-a-word">Add a word</button>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for words...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <button class="ui secondary button add-a-card">Add a card</button>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
@@ -18658,13 +18664,13 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<i class="empty star middle aligned icon"></i>\n<div class="content">\n  <div class="header">' +
+	__p += '<!--\n<i class="empty star middle aligned icon"></i>\n-->\n<div class="content">\n  <div class="header">' +
 	((__t = ( data.title )) == null ? '' : __t) +
 	'</div>\n  <div class="description">' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
 	' <span class="word-content">' +
 	((__t = ( data.content.slice(0, 20) + '...' )) == null ? '' : __t) +
-	'</span></div>\n</div>\n';
+	'</span></div>\n\n  <!--\n  <div class="right floated content">\n    <i class="remove middle aligned icon remove-card"></i>\n  </div>\n  -->\n</div>\n';
 	return __p
 	}
 
@@ -18725,7 +18731,8 @@
 
 	  Deck.prototype.defaults = {
 	    name: 'Default Deck',
-	    description: 'A default deck.'
+	    description: 'A default deck.',
+	    number_of_cards: 0
 	  };
 
 	  return Deck;
@@ -18912,7 +18919,9 @@
 	var __t, __p = '';
 	__p += '<i class="empty star middle aligned icon"></i>\n<div class="content">\n  <div class="header">' +
 	((__t = ( data.name )) == null ? '' : __t) +
-	'</div>\n  <div class="description">' +
+	'</div>\n  <div class="description">(' +
+	((__t = ( data.number_of_cards )) == null ? '' : __t) +
+	') ' +
 	((__t = ( data.description )) == null ? '' : __t) +
 	'</div>\n</div>\n';
 	return __p

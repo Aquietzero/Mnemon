@@ -47,13 +47,34 @@ module.exports = function (app) {
             }
 
             Model.card.findOne({title: title}, function (err, card) {
+                var newCard, isNew = false;
+
                 if (card) {
                     card = _.extend(card, req.body);
                 } else {
+                    isNew = true;
                     card = new Model.card(req.body);
                 }
 
-                card.save(function (err, newCard) {
+                async.series([
+                    function (next) {
+                        card.save(function (err, _newCard) {
+                            if (err) return next(err);
+                            newCard = _newCard;
+                            next()
+                        });
+                    },
+                    function (next) {
+                        if (!isNew) return next();
+
+                        Model.deck.findOne({name: newCard.deck}, function (err, deck) {
+                            // TODO create deck by default.
+                            if (err || !deck) return next();
+                            deck.number_of_cards += 1;
+                            deck.save(next);
+                        });
+                    }
+                ], function (err) {
                     if (err) return res.send({message: 'failed', error: err});
 
                     return res.send({

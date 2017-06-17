@@ -1,6 +1,8 @@
 Backbone = require 'backbone'
 
 class Card extends Backbone.Model
+    idAttribute: '_id'
+
     defaults:
         deck: 'default'
         title: 'Word'
