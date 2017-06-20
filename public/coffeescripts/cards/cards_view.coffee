@@ -1,6 +1,7 @@
 $ = require 'jquery'
 _ = require 'underscore'
 Backbone = require 'backbone'
+Mousetrap = require 'mousetrap'
 require './cards.css'
 
 event = require '../event.coffee'
@@ -44,8 +45,11 @@ class CardsView extends Backbone.View
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
+
         event.on 'card:create', (c) => @collection.unshift c
         @cardPreview
+
+        Mousetrap.bind 'option+n', @addACard
 
         @fetch()
 
@@ -102,6 +106,7 @@ class CardsView extends Backbone.View
         card = new Card(deck: @deck)
         @cardPreview = cardView = new CardView(model: card)
         @$('.card-preview').html cardView.render().el
+        cardView.$('input.title').focus()
 
 
 module.exports = CardsView

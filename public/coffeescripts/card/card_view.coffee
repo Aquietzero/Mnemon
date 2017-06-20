@@ -1,6 +1,7 @@
 $ = require 'jquery'
 _ = require 'underscore'
 Backbone = require 'backbone'
+Mousetrap = require 'mousetrap'
 require './card.css'
 
 event = require '../event.coffee'
@@ -31,7 +32,11 @@ class CardView extends Backbone.View
             unless res.err
                 @wordExplain = res.data
                 @renderWordExplain res.data
+
         @listenTo @model, 'change', @render.bind(@)
+
+        Mousetrap.bind 'option+c', @autoFillCard.bind @
+        Mousetrap.bind 'option+s', @submit.bind @
 
     render: ->
         @$el.html template(@model.toJSON())
