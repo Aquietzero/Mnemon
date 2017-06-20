@@ -14,7 +14,6 @@ class CardView extends Backbone.View
     className: 'card'
 
     events:
-        'blur .title': 'searchWord'
         'change input': 'updateModel'
         'change textarea': 'updateModel'
         'click .submit': 'submit'
@@ -57,6 +56,8 @@ class CardView extends Backbone.View
         if key and val
             @model.set key, val
 
+        @searchWord() if key is 'title'
+
     submit: ->
         $.ajax
             url: '/cards/update'
@@ -68,7 +69,7 @@ class CardView extends Backbone.View
                 event.trigger 'card:create', new Card(res.data)
                 # window.location = "/#cards/detail/#{res.data.title}"
 
-    searchWord: ->
+    searchWord: (e) ->
         title = @$('.title').val()
         console.log(title)
         return unless title
@@ -103,7 +104,7 @@ class CardView extends Backbone.View
         ))
 
         @model.set 'explain', briefExplains.join('\n')
-        @model.set 'content', _.pluck(explains, 'content').join('\\\n\\\n')
+        @model.set 'content', _.pluck(explains, 'content').join('\r\r')
 
         console.log @model.toJSON()
 

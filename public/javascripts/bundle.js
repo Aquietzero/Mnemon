@@ -18183,7 +18183,6 @@
 	  CardView.prototype.className = 'card';
 
 	  CardView.prototype.events = {
-	    'blur .title': 'searchWord',
 	    'change input': 'updateModel',
 	    'change textarea': 'updateModel',
 	    'click .submit': 'submit',
@@ -18243,7 +18242,10 @@
 	    key = $input.attr('name');
 	    val = $input.val();
 	    if (key && val) {
-	      return this.model.set(key, val);
+	      this.model.set(key, val);
+	    }
+	    if (key === 'title') {
+	      return this.searchWord();
 	    }
 	  };
 
@@ -18263,7 +18265,7 @@
 	    });
 	  };
 
-	  CardView.prototype.searchWord = function() {
+	  CardView.prototype.searchWord = function(e) {
 	    var title;
 	    title = this.$('.title').val();
 	    console.log(title);
@@ -18302,7 +18304,7 @@
 	      return _.compact(results);
 	    })));
 	    this.model.set('explain', briefExplains.join('\n'));
-	    this.model.set('content', _.pluck(explains, 'content').join('\\\n\\\n'));
+	    this.model.set('content', _.pluck(explains, 'content').join('\r\r'));
 	    return console.log(this.model.toJSON());
 	  };
 
