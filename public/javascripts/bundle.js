@@ -18405,7 +18405,7 @@
 	((__t = ( data.content )) == null ? '' : __t) +
 	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" name="memory_aids" type="text" value="' +
 	((__t = ( data.memory_aids )) == null ? '' : __t) +
-	'">\n  </div>\n</div>\n\n<div class="section">\n  ';
+	'" placeholder="What? It\\\'s a word.">\n  </div>\n</div>\n\n<div class="section">\n  ';
 	 if (data.connections && data.connections.length > 0) { ;
 	__p += '\n    <div class="connections-section">\n      <div class="header">connections</div>\n      <input class="connections" type="text" value="' +
 	((__t = ( data.connections )) == null ? '' : __t) +
@@ -18467,7 +18467,7 @@
 	    content: 'Words build sentences, which build a language.',
 	    tags: [],
 	    connections: [],
-	    memory_aids: 'What? It\'s a word.'
+	    memory_aids: ''
 	  };
 
 	  return Card;
@@ -18558,16 +18558,24 @@
 	    this.listenTo(this.collection, 'add', this.renderCard);
 	    event.on('card:create', (function(_this) {
 	      return function(c) {
-	        return _this.collection.add(c);
+	        return _this.collection.unshift(c);
 	      };
 	    })(this));
 	    this.cardPreview;
 	    this.fetch();
 	  }
 
+	  CardsView.prototype.adjustSearchBar = function() {
+	    var w;
+	    w = this.$('.search-result').width();
+	    console.log(w);
+	    return this.$('.search-and-add').width(w);
+	  };
+
 	  CardsView.prototype.render = function() {
 	    this.$el.html(template());
 	    this.$('.cards-list').height($(window).height());
+	    window.addEventListener('resize', this.adjustSearchBar);
 	    return this;
 	  };
 
@@ -18581,6 +18589,7 @@
 	      success: (function(_this) {
 	        return function(res) {
 	          _this.collection.add(res.data);
+	          _this.adjustSearchBar();
 	          if (!_this.cardPreview) {
 	            return _this.$('.card-entry:first-child').click();
 	          }
@@ -18594,7 +18603,11 @@
 	    cardEntry = new CardEntryView({
 	      model: card
 	    });
-	    return this.$('.search-result').append(cardEntry.render().el);
+	    if (card === this.collection.models[0]) {
+	      return this.$('.search-result').prepend(cardEntry.render().el);
+	    } else {
+	      return this.$('.search-result').append(cardEntry.render().el);
+	    }
 	  };
 
 	  CardsView.prototype.preview = function(e) {
@@ -18673,7 +18686,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
+	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
 
 	// exports
 
@@ -18684,7 +18697,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for words...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <button class="ui secondary button add-a-card">Add a card</button>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="search-and-add">\n      <div class="ui category search">\n        <div class="ui icon input">\n          <input class="prompt" type="text" placeholder="Search for words...">\n          <i class="search icon"></i>\n        </div>\n      </div>\n\n      <hr class="search-delimiter">\n\n      <button class="ui secondary button add-a-card">Add a card</button>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
@@ -18699,7 +18712,7 @@
 	'</div>\n  <div class="description">' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
 	' <span class="word-content">' +
-	((__t = ( data.explain.slice(0, 20) + '...' )) == null ? '' : __t) +
+	((__t = ( data.explain.length > 20 ? data.explain.slice(0, 20) + '...' : data.explain )) == null ? '' : __t) +
 	'</span></div>\n\n  <!--\n  <div class="right floated content">\n    <i class="remove middle aligned icon remove-card"></i>\n  </div>\n  -->\n</div>\n';
 	return __p
 	}

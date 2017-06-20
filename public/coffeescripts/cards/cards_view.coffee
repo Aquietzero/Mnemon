@@ -44,14 +44,21 @@ class CardsView extends Backbone.View
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
-        event.on 'card:create', (c) => @collection.add c
+        event.on 'card:create', (c) => @collection.unshift c
         @cardPreview
 
         @fetch()
 
+    # TODO dummy way to adjust width
+    adjustSearchBar: ->
+        w = @$('.search-result').width()
+        console.log w
+        @$('.search-and-add').width w
+
     render: ->
         @$el.html template()
         @$('.cards-list').height $(window).height()
+        window.addEventListener 'resize', @adjustSearchBar
         @
 
     fetch: ->
@@ -61,13 +68,17 @@ class CardsView extends Backbone.View
             data: query: JSON.stringify @query
             success: (res) =>
                 @collection.add res.data
-
+                @adjustSearchBar()
                 unless @cardPreview
                     @$('.card-entry:first-child').click()
 
     renderCard: (card) =>
         cardEntry = new CardEntryView(model: card)
-        @$('.search-result').append cardEntry.render().el
+
+        if card is @collection.models[0]
+            @$('.search-result').prepend cardEntry.render().el
+        else
+            @$('.search-result').append cardEntry.render().el
 
     preview: (e) ->
         if @cardPreview

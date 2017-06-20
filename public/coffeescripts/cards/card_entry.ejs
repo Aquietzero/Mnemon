@@ -3,7 +3,7 @@
 -->
 <div class="content">
   <div class="header"><%= data.title %></div>
-  <div class="description"><%= data.sub_title %> <span class="word-content"><%= data.explain.slice(0, 20) + '...' %></span></div>
+  <div class="description"><%= data.sub_title %> <span class="word-content"><%= data.explain.length > 20 ? data.explain.slice(0, 20) + '...' : data.explain %></span></div>
 
   <!--
   <div class="right floated content">

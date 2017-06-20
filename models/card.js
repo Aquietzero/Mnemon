@@ -46,11 +46,11 @@ var CardSchema = new Schema({
 
     created_at: {
         type: Date,
-        default: Date.new
+        default: Date.now
     },
     updated_at: {
         type: Date,
-        default: Date.new
+        default: Date.now
     },
 });
 

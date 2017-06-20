@@ -13,7 +13,7 @@ class Card extends Backbone.Model
         # connections: ['Sentence', 'Language'],
         tags: []
         connections: []
-        memory_aids: 'What? It\'s a word.'
+        memory_aids: ''
 
 module.exports = Card
 
