@@ -19,7 +19,8 @@ class DeckEntryView extends Backbone.View
     className: 'item deck-entry'
 
     events:
-        'click': 'toDeckCards'
+        'click .header': 'toDeckCards'
+        'click .review': 'toReview'
 
     render: ->
         @$el.html deck_entry_template(@model.toJSON())
@@ -28,6 +29,9 @@ class DeckEntryView extends Backbone.View
 
     toDeckCards: ->
         window.location = "/#decks/#{@model.get 'name'}/cards"
+
+    toReview: ->
+        window.location = "/#decks/#{@model.get 'name'}/review"
 
 
 class DecksView extends Backbone.View

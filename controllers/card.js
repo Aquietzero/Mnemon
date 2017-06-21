@@ -5,14 +5,13 @@ var Model = require('../model');
 module.exports = function (app) {
     return {
         all: function (req, res) {
-            console.log(req.body);
-            var defaultQ = {limit: 20, skip: 0};
+            var defaultQ = {q: {}, limit: 20, page: 0};
             var query = _.extend(defaultQ, JSON.parse(req.body.query) || {});
 
             Model.card
             .find(query.q)
-            .skip(query.skip)
-            //.limit(query.limit)
+            .skip(query.page * query.limit)
+            .limit(query.limit)
             .sort({created_at: -1})
             .exec(function (err, cards) {
                 if (err) return res.send({message: 'failed', error: err});

@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, Router,
+	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, ReviewView, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -65,6 +65,8 @@
 	CardsView = __webpack_require__(35);
 
 	DecksView = __webpack_require__(41);
+
+	ReviewView = __webpack_require__(46);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -100,6 +102,12 @@
 	        break;
 	      case 'decks':
 	        this.currentPage = new DecksView();
+	        this.$('.content').html(this.currentPage.render().el);
+	        break;
+	      case 'review':
+	        this.currentPage = new ReviewView({
+	          deck: params[0]
+	        });
 	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      default:
@@ -16473,7 +16481,8 @@
 	    'cards/detail(/:title)': 'card',
 	    'cards/list': 'cards',
 	    'decks/list': 'decks',
-	    'decks/:deck/cards': 'cards'
+	    'decks/:deck/cards': 'cards',
+	    'decks/:deck/review': 'review'
 	  };
 
 	  function Router(opts) {
@@ -16496,6 +16505,10 @@
 
 	  Router.prototype.decks = function() {
 	    return this.renderPage('decks', arguments);
+	  };
+
+	  Router.prototype.review = function() {
+	    return this.renderPage('review', arguments);
 	  };
 
 	  return Router;
@@ -19594,7 +19607,8 @@
 
 	  CardsView.prototype.events = {
 	    'click .card-entry': 'preview',
-	    'click .add-a-card': 'addACard'
+	    'click .add-a-card': 'addACard',
+	    'scroll .search-result': 'scrolling'
 	  };
 
 	  function CardsView(options) {
@@ -19602,6 +19616,7 @@
 	    var q;
 	    CardsView.__super__.constructor.apply(this, arguments);
 	    console.log('init cards.');
+	    this.cardPreview;
 	    this.deck = (options != null ? options.deck : void 0) || 'default';
 	    q = {
 	      deck: this.deck
@@ -19609,7 +19624,6 @@
 	    this.query = {
 	      q: q,
 	      page: 0,
-	      skip: 0,
 	      limit: 20
 	    };
 	    this.collection = new Cards();
@@ -19619,7 +19633,6 @@
 	        return _this.collection.unshift(c);
 	      };
 	    })(this));
-	    this.cardPreview;
 	    Mousetrap.bind('option+n', this.addACard);
 	    this.fetch();
 	  }
@@ -19627,7 +19640,6 @@
 	  CardsView.prototype.adjustSearchBar = function() {
 	    var w;
 	    w = this.$('.search-result').width();
-	    console.log(w);
 	    return this.$('.search-and-add').width(w);
 	  };
 
@@ -19746,7 +19758,7 @@
 
 
 	// module
-	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.cards-list .search-result {\n  margin-top: 14px;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
+	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
 
 	// exports
 
@@ -19865,7 +19877,8 @@
 	  DeckEntryView.prototype.className = 'item deck-entry';
 
 	  DeckEntryView.prototype.events = {
-	    'click': 'toDeckCards'
+	    'click .header': 'toDeckCards',
+	    'click .review': 'toReview'
 	  };
 
 	  DeckEntryView.prototype.render = function() {
@@ -19876,6 +19889,10 @@
 
 	  DeckEntryView.prototype.toDeckCards = function() {
 	    return window.location = "/#decks/" + (this.model.get('name')) + "/cards";
+	  };
+
+	  DeckEntryView.prototype.toReview = function() {
+	    return window.location = "/#decks/" + (this.model.get('name')) + "/review";
 	  };
 
 	  return DeckEntryView;
@@ -20010,7 +20027,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="eight wide column cards-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column deck-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="eight wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column deck-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
@@ -20020,13 +20037,149 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<i class="empty star middle aligned icon"></i>\n<div class="content">\n  <div class="header">' +
+	__p += '<div class="right floated content review">\n  <i class="empty star middle aligned icon"></i>\n  <i class="food middle aligned icon"></i>\n</div>\n<div class="content">\n  <div class="header">' +
 	((__t = ( data.name )) == null ? '' : __t) +
 	'</div>\n  <div class="description">(' +
 	((__t = ( data.number_of_cards )) == null ? '' : __t) +
 	') ' +
 	((__t = ( data.description )) == null ? '' : __t) +
 	'</div>\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, Card, CardView, ReviewView, _, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	__webpack_require__(47);
+
+	Card = __webpack_require__(34);
+
+	CardView = __webpack_require__(26);
+
+	template = __webpack_require__(49);
+
+	ReviewView = (function(superClass) {
+	  extend(ReviewView, superClass);
+
+	  ReviewView.prototype.className = 'review-flow';
+
+	  function ReviewView(options) {
+	    var q;
+	    ReviewView.__super__.constructor.apply(this, arguments);
+	    console.log('init reviews.');
+	    this.currentCard;
+	    this.deck = (options != null ? options.deck : void 0) || 'default';
+	    q = {
+	      deck: this.deck
+	    };
+	    this.query = {
+	      q: q,
+	      page: 0,
+	      limit: 20
+	    };
+	    this.fetch();
+	  }
+
+	  ReviewView.prototype.render = function() {
+	    this.$el.html(template());
+	    return this;
+	  };
+
+	  ReviewView.prototype.fetch = function() {
+	    return $.ajax({
+	      url: '/cards',
+	      method: 'post',
+	      data: {
+	        query: JSON.stringify(this.query)
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          var card;
+	          card = res.data[0];
+	          return _this.addACard(card);
+	        };
+	      })(this)
+	    });
+	  };
+
+	  ReviewView.prototype.addACard = function(card) {
+	    var cardView;
+	    if (this.currentCard) {
+	      this.currentCard.remove();
+	      delete this.currentCard;
+	    }
+	    card = new Card(card);
+	    this.currentCard = cardView = new CardView({
+	      model: card
+	    });
+	    return this.$('.current-card').html(cardView.render().el);
+	  };
+
+	  return ReviewView;
+
+	})(Backbone.View);
+
+	module.exports = ReviewView;
+
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(48);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./review.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./review.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 49 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<div class="current-card"></div>\n';
 	return __p
 	}
 

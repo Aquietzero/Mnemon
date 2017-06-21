@@ -7,6 +7,7 @@ class Router extends Backbone.Router
         'cards/list': 'cards' # View all cards.
         'decks/list': 'decks'
         'decks/:deck/cards': 'cards' # View cards in a deck.
+        'decks/:deck/review': 'review' # Review cards of a deck.
 
     constructor: (opts) ->
         super opts
@@ -19,6 +20,7 @@ class Router extends Backbone.Router
     card: -> @renderPage 'card', arguments
     cards: -> @renderPage 'cards', arguments
     decks: -> @renderPage 'decks', arguments
+    review: -> @renderPage 'review', arguments
 
 module.exports = Router
 

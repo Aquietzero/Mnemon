@@ -64,3 +64,19 @@ If the limit of daily new cards is specified, then only the limit of new cards s
 #### Put a card
 
 1. Put in the box with current time according to the answer of user.
+
+
+### Think about grammar connection
+
+Grammars with similar ideas should be grouped together. Differences between these grammars should be pointed out in detail.
+
+### Think about adding tags in a simple way
+
+Tag types:
+
++ word type
++ usage
++ meaning
++ reference
+
+

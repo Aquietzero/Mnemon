@@ -30,25 +30,27 @@ class CardsView extends Backbone.View
     events:
         'click .card-entry': 'preview'
         'click .add-a-card': 'addACard'
+        'scroll .search-result': 'scrolling'
 
     constructor: (options) ->
         super
         console.log 'init cards.'
 
+        @cardPreview
         @deck = options?.deck || 'default'
         q = deck: @deck
 
         @query =
             q: q
             page: 0
-            skip: 0
             limit: 20
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
 
+        # global events.
         event.on 'card:create', (c) => @collection.unshift c
-        @cardPreview
 
+        # keyboard shortcuts.
         Mousetrap.bind 'option+n', @addACard
 
         @fetch()
@@ -56,12 +58,13 @@ class CardsView extends Backbone.View
     # TODO dummy way to adjust width
     adjustSearchBar: ->
         w = @$('.search-result').width()
-        console.log w
         @$('.search-and-add').width w
 
     render: ->
         @$el.html template()
         @$('.cards-list').height $(window).height()
+
+        # window events.
         window.addEventListener 'resize', @adjustSearchBar
         @
 
