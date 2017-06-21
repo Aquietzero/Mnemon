@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, ReviewView, Router,
+	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, HelpView, ReviewView, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -67,6 +67,8 @@
 	DecksView = __webpack_require__(41);
 
 	ReviewView = __webpack_require__(46);
+
+	HelpView = __webpack_require__(50);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -108,6 +110,10 @@
 	        this.currentPage = new ReviewView({
 	          deck: params[0]
 	        });
+	        this.$('.content').html(this.currentPage.render().el);
+	        break;
+	      case 'help':
+	        this.currentPage = new HelpView();
 	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      default:
@@ -16482,7 +16488,8 @@
 	    'cards/list': 'cards',
 	    'decks/list': 'decks',
 	    'decks/:deck/cards': 'cards',
-	    'decks/:deck/review': 'review'
+	    'decks/:deck/review': 'review',
+	    'help': 'help'
 	  };
 
 	  function Router(opts) {
@@ -16509,6 +16516,10 @@
 
 	  Router.prototype.review = function() {
 	    return this.renderPage('review', arguments);
+	  };
+
+	  Router.prototype.help = function() {
+	    return this.renderPage('help', arguments);
 	  };
 
 	  return Router;
@@ -20135,6 +20146,9 @@
 	  };
 
 	  ReviewView.prototype.nextCard = function() {
+	    if (this.currentIndex === this.cards.length - 1) {
+	      return alert('Last Card.');
+	    }
 	    this.currentIndex++;
 	    if (this.cards[this.currentIndex]) {
 	      return this.addACard(this.cards[this.currentIndex]);
@@ -20196,7 +20210,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, ".review-flow .card {\n  margin: 30px auto;\n}\n", ""]);
 
 	// exports
 
@@ -20208,6 +20222,96 @@
 	module.exports = function (data) {
 	var __t, __p = '';
 	__p += '<div class="current-card"></div>\n';
+	return __p
+	}
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, HelpView, _, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	__webpack_require__(51);
+
+	template = __webpack_require__(53);
+
+	HelpView = (function(superClass) {
+	  extend(HelpView, superClass);
+
+	  HelpView.prototype.className = 'help-page';
+
+	  function HelpView(options) {
+	    HelpView.__super__.constructor.apply(this, arguments);
+	    console.log('help reviews.');
+	  }
+
+	  HelpView.prototype.render = function() {
+	    this.$el.html(template());
+	    return this;
+	  };
+
+	  return HelpView;
+
+	})(Backbone.View);
+
+	module.exports = HelpView;
+
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(52);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./help.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./help.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, ".help-page .column {\n  padding: 30px;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<div class="ui three column grid">\n  <div class="column">\n    <h1>Mnemon</h1>\n\n    <p>Mnemon is a tool for better card management and memorization. Cards are grouped by decks. A deck can be built on personal preference or some specific study targets.</p>\n\n    <p>A basic spacing repetition method is adopted as the main algorithm of card memorization in Mnemon. Preset repitition periods are 1 minute, 10 minute, 1 day, 4 days, 10 days, a month and 3 months. In cards review flow, only 2 feedbacks are collected, namely `REMEMBER` and `NOT REMEMBER`, which greatly follows human instinct.</p>\n  </div>\n  <div class="column">\n    <h2>Keyboard Shortcuts</h2>\n\n    <p>There are some preset keyboard shortcuts to facilitate usage. A group of keyboard shortcuts are set for each section. The following presets are arranged in sections.</p>\n\n    <h3>Cards Section</h3>\n\n    <ul>\n      <li><strong>\'opt + n\'</strong>: Create a new card.</li>\n      <li><strong>\'opt + c\'</strong>: Automatically copy explaination to the new card.</li>\n      <li><strong>\'opt + s\'</strong>: Save new card.</li>\n    </ul>\n\n    <h3>Review Section</h3>\n\n    <ul>\n      <li><strong>\'left\'</strong>: Navigate to the previous card.</li>\n      <li><strong>\'right\'</strong>: Navigate to the next card.</li>\n    </ul>\n  </div>\n\n  <div class="column">\n    <h2>Plans</h2>\n  </div>\n</div>\n';
 	return __p
 	}
 

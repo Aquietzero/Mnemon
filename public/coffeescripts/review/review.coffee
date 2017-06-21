@@ -58,6 +58,9 @@ class ReviewView extends Backbone.View
         @$('.current-card').html cardView.render().el
 
     nextCard: ->
+        if @currentIndex is @cards.length - 1
+            return alert 'Last Card.'
+
         @currentIndex++
         if @cards[@currentIndex]
             @addACard @cards[@currentIndex]

@@ -12,6 +12,7 @@ CardView = require './card/card_view.coffee'
 CardsView = require './cards/cards_view.coffee'
 DecksView = require './decks/decks_view.coffee'
 ReviewView = require './review/review.coffee'
+HelpView = require './help/help.coffee'
 
 class App extends Backbone.View
     constructor: (options) ->
@@ -40,6 +41,9 @@ class App extends Backbone.View
                 @$('.content').html @currentPage.render().el
             when 'review'
                 @currentPage = new ReviewView(deck: params[0])
+                @$('.content').html @currentPage.render().el
+            when 'help'
+                @currentPage = new HelpView()
                 @$('.content').html @currentPage.render().el
             else @render()
 
