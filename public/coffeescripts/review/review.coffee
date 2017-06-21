@@ -1,6 +1,7 @@
 $ = require 'jquery'
 _ = require 'underscore'
 Backbone = require 'backbone'
+Mousetrap = require 'mousetrap'
 require './review.css'
 
 Card = require '../card/card.coffee'
@@ -14,7 +15,10 @@ class ReviewView extends Backbone.View
     constructor: (options) ->
         super
         console.log 'init reviews.'
+
+        @cards = []
         @currentCard
+        @currentIndex = 0
         @deck = options?.deck || 'default'
         q = deck: @deck
 
@@ -22,6 +26,9 @@ class ReviewView extends Backbone.View
             q: q
             page: 0
             limit: 20
+
+        Mousetrap.bind 'left', @prevCard.bind @
+        Mousetrap.bind 'right', @nextCard.bind @
 
         @fetch()
 
@@ -35,8 +42,11 @@ class ReviewView extends Backbone.View
             method: 'post'
             data: query: JSON.stringify @query
             success: (res) =>
-                card = res.data[0]
-                @addACard card
+                unless res.data && res.data.length > 0
+                    return alert 'Last Card.'
+
+                @cards = _.union @cards, res.data
+                @addACard @cards[@currentIndex]
 
     addACard: (card) ->
         if @currentCard
@@ -47,5 +57,20 @@ class ReviewView extends Backbone.View
         @currentCard = cardView = new CardView(model: card)
         @$('.current-card').html cardView.render().el
 
+    nextCard: ->
+        @currentIndex++
+        if @cards[@currentIndex]
+            @addACard @cards[@currentIndex]
+        else
+            @query.page++
+            @fetch()
+
+    prevCard: ->
+        if @currentIndex is 0
+            return alert 'First Card.'
+
+        @currentIndex--
+        if @cards[@currentIndex]
+            @addACard @cards[@currentIndex]
 
 module.exports = ReviewView

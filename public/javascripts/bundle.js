@@ -20051,7 +20051,7 @@
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Card, CardView, ReviewView, _, template,
+	var $, Backbone, Card, CardView, Mousetrap, ReviewView, _, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -20060,6 +20060,8 @@
 	_ = __webpack_require__(22);
 
 	Backbone = __webpack_require__(18);
+
+	Mousetrap = __webpack_require__(27);
 
 	__webpack_require__(47);
 
@@ -20078,7 +20080,9 @@
 	    var q;
 	    ReviewView.__super__.constructor.apply(this, arguments);
 	    console.log('init reviews.');
+	    this.cards = [];
 	    this.currentCard;
+	    this.currentIndex = 0;
 	    this.deck = (options != null ? options.deck : void 0) || 'default';
 	    q = {
 	      deck: this.deck
@@ -20088,6 +20092,8 @@
 	      page: 0,
 	      limit: 20
 	    };
+	    Mousetrap.bind('left', this.prevCard.bind(this));
+	    Mousetrap.bind('right', this.nextCard.bind(this));
 	    this.fetch();
 	  }
 
@@ -20105,9 +20111,11 @@
 	      },
 	      success: (function(_this) {
 	        return function(res) {
-	          var card;
-	          card = res.data[0];
-	          return _this.addACard(card);
+	          if (!(res.data && res.data.length > 0)) {
+	            return alert('Last Card.');
+	          }
+	          _this.cards = _.union(_this.cards, res.data);
+	          return _this.addACard(_this.cards[_this.currentIndex]);
 	        };
 	      })(this)
 	    });
@@ -20124,6 +20132,26 @@
 	      model: card
 	    });
 	    return this.$('.current-card').html(cardView.render().el);
+	  };
+
+	  ReviewView.prototype.nextCard = function() {
+	    this.currentIndex++;
+	    if (this.cards[this.currentIndex]) {
+	      return this.addACard(this.cards[this.currentIndex]);
+	    } else {
+	      this.query.page++;
+	      return this.fetch();
+	    }
+	  };
+
+	  ReviewView.prototype.prevCard = function() {
+	    if (this.currentIndex === 0) {
+	      return alert('First Card.');
+	    }
+	    this.currentIndex--;
+	    if (this.cards[this.currentIndex]) {
+	      return this.addACard(this.cards[this.currentIndex]);
+	    }
 	  };
 
 	  return ReviewView;
