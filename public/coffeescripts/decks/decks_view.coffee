@@ -6,38 +6,27 @@ require './decks.css'
 template = require './decks.ejs'
 deck_entry_template = require './deck_entry.ejs'
 
-class Deck extends Backbone.Model
-    defaults:
-        name: 'Default Deck'
-        description: 'A default deck.'
-        number_of_cards: 0
+Deck = require '../deck/deck.coffee'
+DeckView = require '../deck/deck_view.coffee'
+
 
 class Decks extends Backbone.Collection
     model: Deck
 
+
 class DeckEntryView extends Backbone.View
     className: 'item deck-entry'
-
-    events:
-        'click .header': 'toDeckCards'
-        'click .review': 'toReview'
 
     render: ->
         @$el.html deck_entry_template(@model.toJSON())
         @$el.attr 'id', @model.get('name')
         @
 
-    toDeckCards: ->
-        window.location = "/#decks/#{@model.get 'name'}/cards"
-
-    toReview: ->
-        window.location = "/#decks/#{@model.get 'name'}/review"
-
-
 class DecksView extends Backbone.View
     className: 'decks'
 
     events:
+        'click .deck-entry': 'preview'
         'click .add-a-deck .submit': 'addADeck'
         'click .toggle-add-a-deck': 'toggleAddADeck'
 
@@ -56,7 +45,7 @@ class DecksView extends Backbone.View
 
     render: ->
         @$el.html template()
-        @$('.cards-list').height $(window).height()
+        @$('.decks-list').height $(window).height()
         @
 
     fetch: ->
@@ -67,6 +56,7 @@ class DecksView extends Backbone.View
                 query: @query
             success: (res) =>
                 @collection.add res.data
+                @$('.deck-entry:first-child').click()
 
     renderDeck: (deck) ->
         deckEntry = new DeckEntryView(model: deck)
@@ -87,6 +77,13 @@ class DecksView extends Backbone.View
                 description: description
             success: (res) =>
                 @collection.unshift res.data
+
+    preview: (e) ->
+        $entry = $(e.currentTarget)
+        name = $entry.attr 'id'
+        deck = @collection.findWhere name: name
+        deckView = new DeckView(model: deck)
+        @$('.deck-preview').html deckView.render().el
 
 
 module.exports = DecksView

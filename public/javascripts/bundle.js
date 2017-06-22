@@ -66,9 +66,9 @@
 
 	DecksView = __webpack_require__(41);
 
-	ReviewView = __webpack_require__(46);
+	ReviewView = __webpack_require__(51);
 
-	HelpView = __webpack_require__(50);
+	HelpView = __webpack_require__(55);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -16487,6 +16487,7 @@
 	    'cards/detail(/:title)': 'card',
 	    'cards/list': 'cards',
 	    'decks/list': 'decks',
+	    'decks/detail/:deck': 'deck',
 	    'decks/:deck/cards': 'cards',
 	    'decks/:deck/review': 'review',
 	    'help': 'help'
@@ -16508,6 +16509,10 @@
 
 	  Router.prototype.cards = function() {
 	    return this.renderPage('cards', arguments);
+	  };
+
+	  Router.prototype.deck = function() {
+	    return this.renderPage('deck', arguments);
 	  };
 
 	  Router.prototype.decks = function() {
@@ -19832,7 +19837,7 @@
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Deck, DeckEntryView, Decks, DecksView, _, deck_entry_template, template,
+	var $, Backbone, Deck, DeckEntryView, DeckView, Decks, DecksView, _, deck_entry_template, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -19848,22 +19853,9 @@
 
 	deck_entry_template = __webpack_require__(45);
 
-	Deck = (function(superClass) {
-	  extend(Deck, superClass);
+	Deck = __webpack_require__(46);
 
-	  function Deck() {
-	    return Deck.__super__.constructor.apply(this, arguments);
-	  }
-
-	  Deck.prototype.defaults = {
-	    name: 'Default Deck',
-	    description: 'A default deck.',
-	    number_of_cards: 0
-	  };
-
-	  return Deck;
-
-	})(Backbone.Model);
+	DeckView = __webpack_require__(47);
 
 	Decks = (function(superClass) {
 	  extend(Decks, superClass);
@@ -19887,23 +19879,10 @@
 
 	  DeckEntryView.prototype.className = 'item deck-entry';
 
-	  DeckEntryView.prototype.events = {
-	    'click .header': 'toDeckCards',
-	    'click .review': 'toReview'
-	  };
-
 	  DeckEntryView.prototype.render = function() {
 	    this.$el.html(deck_entry_template(this.model.toJSON()));
 	    this.$el.attr('id', this.model.get('name'));
 	    return this;
-	  };
-
-	  DeckEntryView.prototype.toDeckCards = function() {
-	    return window.location = "/#decks/" + (this.model.get('name')) + "/cards";
-	  };
-
-	  DeckEntryView.prototype.toReview = function() {
-	    return window.location = "/#decks/" + (this.model.get('name')) + "/review";
 	  };
 
 	  return DeckEntryView;
@@ -19916,6 +19895,7 @@
 	  DecksView.prototype.className = 'decks';
 
 	  DecksView.prototype.events = {
+	    'click .deck-entry': 'preview',
 	    'click .add-a-deck .submit': 'addADeck',
 	    'click .toggle-add-a-deck': 'toggleAddADeck'
 	  };
@@ -19935,7 +19915,7 @@
 
 	  DecksView.prototype.render = function() {
 	    this.$el.html(template());
-	    this.$('.cards-list').height($(window).height());
+	    this.$('.decks-list').height($(window).height());
 	    return this;
 	  };
 
@@ -19948,7 +19928,8 @@
 	      },
 	      success: (function(_this) {
 	        return function(res) {
-	          return _this.collection.add(res.data);
+	          _this.collection.add(res.data);
+	          return _this.$('.deck-entry:first-child').click();
 	        };
 	      })(this)
 	    });
@@ -19983,6 +19964,19 @@
 	        };
 	      })(this)
 	    });
+	  };
+
+	  DecksView.prototype.preview = function(e) {
+	    var $entry, deck, deckView, name;
+	    $entry = $(e.currentTarget);
+	    name = $entry.attr('id');
+	    deck = this.collection.findWhere({
+	      name: name
+	    });
+	    deckView = new DeckView({
+	      model: deck
+	    });
+	    return this.$('.deck-preview').html(deckView.render().el);
 	  };
 
 	  return DecksView;
@@ -20027,7 +20021,7 @@
 
 
 	// module
-	exports.push([module.id, ".add-a-deck .form {\n  margin: 20px 0;\n}\n\n.add-a-deck .form.hide {\n  display: none;\n}\n", ""]);
+	exports.push([module.id, ".add-a-deck .form {\n  margin: 20px 0;\n}\n\n.add-a-deck .form.hide {\n  display: none;\n}\n\n.decks-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n", ""]);
 
 	// exports
 
@@ -20062,6 +20056,135 @@
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var Backbone, Deck,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	Backbone = __webpack_require__(18);
+
+	Deck = (function(superClass) {
+	  extend(Deck, superClass);
+
+	  function Deck() {
+	    return Deck.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Deck.prototype.defaults = {
+	    name: 'Default Deck',
+	    description: 'A default deck.',
+	    number_of_cards: 0
+	  };
+
+	  return Deck;
+
+	})(Backbone.Model);
+
+	module.exports = Deck;
+
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, DeckView, _, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	__webpack_require__(48);
+
+	template = __webpack_require__(50);
+
+	DeckView = (function(superClass) {
+	  extend(DeckView, superClass);
+
+	  function DeckView() {
+	    return DeckView.__super__.constructor.apply(this, arguments);
+	  }
+
+	  DeckView.prototype.className = 'deck-detail';
+
+	  DeckView.prototype.render = function() {
+	    this.$el.html(template(this.model.toJSON()));
+	    return this;
+	  };
+
+	  return DeckView;
+
+	})(Backbone.View);
+
+	module.exports = DeckView;
+
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(49);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./deck.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./deck.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 50 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '';
+	__p += '<div class="basic-info">\n  <h1>' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'</h1>\n  <p>' +
+	((__t = ( data.description )) == null ? '' : __t) +
+	'</p>\n  <div class="ui one statistics">\n    <div class="blue statistic">\n      <div class="value">' +
+	((__t = ( data.number_of_cards )) == null ? '' : __t) +
+	'</div>\n      <div class="label">Cards</div>\n    </div>\n  </div>\n  <div class="ui buttons">\n    <a class="ui button" href="/#decks/' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'/review">\n      <i class="left unhide icon"></i>\n      View\n    </a>\n    <div class="or"></div>\n    <a class="ui button" href="/#decks/' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'/cards">\n      Edit\n      <i class="right edit icon"></i>\n    </a>\n  </div>\n\n  <hr>\n  <div class="ui button black large">Start Review</div>\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var $, Backbone, Card, CardView, Mousetrap, ReviewView, _, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
@@ -20074,13 +20197,13 @@
 
 	Mousetrap = __webpack_require__(27);
 
-	__webpack_require__(47);
+	__webpack_require__(52);
 
 	Card = __webpack_require__(34);
 
 	CardView = __webpack_require__(26);
 
-	template = __webpack_require__(49);
+	template = __webpack_require__(54);
 
 	ReviewView = (function(superClass) {
 	  extend(ReviewView, superClass);
@@ -20176,13 +20299,13 @@
 
 
 /***/ },
-/* 47 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(48);
+	var content = __webpack_require__(53);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -20202,7 +20325,7 @@
 	}
 
 /***/ },
-/* 48 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -20216,7 +20339,7 @@
 
 
 /***/ },
-/* 49 */
+/* 54 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -20226,7 +20349,7 @@
 	}
 
 /***/ },
-/* 50 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, HelpView, _, template,
@@ -20239,9 +20362,9 @@
 
 	Backbone = __webpack_require__(18);
 
-	__webpack_require__(51);
+	__webpack_require__(56);
 
-	template = __webpack_require__(53);
+	template = __webpack_require__(58);
 
 	HelpView = (function(superClass) {
 	  extend(HelpView, superClass);
@@ -20266,13 +20389,13 @@
 
 
 /***/ },
-/* 51 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(52);
+	var content = __webpack_require__(57);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -20292,7 +20415,7 @@
 	}
 
 /***/ },
-/* 52 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -20306,7 +20429,7 @@
 
 
 /***/ },
-/* 53 */
+/* 58 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {

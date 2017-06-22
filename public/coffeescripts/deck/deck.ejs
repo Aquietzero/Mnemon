@@ -1,0 +1,24 @@
+<div class="basic-info">
+  <h1><%= data.name %></h1>
+  <p><%= data.description %></p>
+  <div class="ui one statistics">
+    <div class="blue statistic">
+      <div class="value"><%= data.number_of_cards %></div>
+      <div class="label">Cards</div>
+    </div>
+  </div>
+  <div class="ui buttons">
+    <a class="ui button" href="/#decks/<%= data.name %>/review">
+      <i class="left unhide icon"></i>
+      View
+    </a>
+    <div class="or"></div>
+    <a class="ui button" href="/#decks/<%= data.name %>/cards">
+      Edit
+      <i class="right edit icon"></i>
+    </a>
+  </div>
+
+  <hr>
+  <div class="ui button black large">Start Review</div>
+</div>

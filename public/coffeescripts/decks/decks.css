@@ -5,3 +5,10 @@
 .add-a-deck .form.hide {
   display: none;
 }
+
+.decks-list {
+  min-height: 100%;
+  border-right: solid 1px #999;
+  overflow: scroll;
+}
+

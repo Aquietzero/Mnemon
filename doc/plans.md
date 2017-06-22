@@ -65,6 +65,14 @@ If the limit of daily new cards is specified, then only the limit of new cards s
 
 1. Put in the box with current time according to the answer of user.
 
+#### Deck page
+
+Deck page is an important transition page from deck list to review flow. Since new cards will be continuously added to decks, so once user enters a specific deck, maybe that is a good timing for setup mnomons for new cards.
+
++ Display basic deck information, including card numbers, name and creating time.
++ Show whether the deck is under review or not.
++ If the deck is not under a review, show a button for review setup.
++ If the deck is under review, show numbers of cards in each stage.
 
 ### Think about grammar connection
 

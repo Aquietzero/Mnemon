@@ -103,5 +103,66 @@ describe('Test for mnemon card memorization flow.', () => {
             });
         });
     });
+
+    describe('Mnemon#put', () => {
+        beforeEach((done) => {
+            async.series([
+                (next) => {
+                    Model.mnemon.reviewDeck('zero', 'deck1', next);
+                },
+                (next) => {
+                    var updated_at = new Date();
+                    updated_at.setMinutes(updated_at.getMinutes() - 2);
+                    Model.mnemon.update({}, {
+                        created_at: updated_at,
+                        updated_at: updated_at,
+                    }, {multi: true}, next);
+                },
+            ], done);
+        });
+
+        it('should be able to put a card into a proper box.', (done) => {
+            Model.mnemon.put('zero', 'deck1', 'card1', true, (err, mnemon) => {
+                mnemon.box.should.equal('10MIN');
+                done();
+            });
+        });
+
+        it('should be able to put a card into a proper box.', (done) => {
+            Model.mnemon.put('zero', 'deck1', 'card1', false, (err, mnemon) => {
+                mnemon.box.should.equal('1MIN');
+                done();
+            });
+        });
+
+        it('should be able to put a card into a proper box.', (done) => {
+            async.series([
+                function (next) {
+                    Model.mnemon.put('zero', 'deck1', 'card1', true, (err, mnemon) => {
+                        mnemon.box.should.equal('10MIN');
+                        next();
+                    });
+                },
+                function (next) {
+                    Model.mnemon.put('zero', 'deck1', 'card1', false, (err, mnemon) => {
+                        mnemon.box.should.equal('1MIN');
+                        next();
+                    });
+                },
+                function (next) {
+                    Model.mnemon.put('zero', 'deck1', 'card1', true, next);
+                },
+                function (next) {
+                    Model.mnemon.put('zero', 'deck1', 'card1', true, next);
+                },
+                function (next) {
+                    Model.mnemon.put('zero', 'deck1', 'card1', true, (err, mnemon) => {
+                        mnemon.box.should.equal('4D');
+                        next();
+                    });
+                },
+            ], done);
+        });
+    });
 });
 
