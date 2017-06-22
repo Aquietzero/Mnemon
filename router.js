@@ -1,7 +1,7 @@
-var loadDir = require('./utils').loadDir;
+const loadDir = require('./utils').loadDir;
 
-module.exports = function (app) {
-    var Routers = loadDir('controllers', app);
+module.exports = (app) => {
+    let Routers = loadDir('controllers', app);
 
     app.get('/', Routers.index.home);
 
@@ -13,4 +13,9 @@ module.exports = function (app) {
     app.post('/cards', Routers.card.all);
     app.post('/cards/detail', Routers.card.detail);
     app.post('/cards/update', Routers.card.update);
+
+    // Review
+    app.get('/review/:deck/setup', Routers.review.setup);
+    app.get('/review/:deck/statistics', Routers.review.statistics);
+    app.post('/review/pick', Routers.review.pick);
 }

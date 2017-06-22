@@ -1,19 +1,16 @@
 <div class="section">
-  <div class="right floated content autofill">
-    <i class="camera retro middle aligned icon remove-card"></i>
-  </div>
-  <input class="title" name="title" type="text" value="<%= data.title %>" placeholder="Word" />
-  <input class="sub-title" name="sub_title" type="text" value="<%= data.sub_title %>" placeholder="Noun" />
+  <input class="title" name="title" type="text" value="<%= data.title %>" disabled />
+  <input class="sub-title" name="sub_title" type="text" value="<%= data.sub_title %>" disabled />
 </div>
 
 <hr />
 
 <div class="section">
-  <textarea class="explain" id="" name="explain"><%= data.explain %></textarea>
+  <textarea disabled class="explain" id="" name="explain"><%= data.explain %></textarea>
 </div>
 
 <div class="section">
-  <textarea class="content" id="" name="content"><%= data.content %></textarea>
+  <textarea disabled class="content" id="" name="content"><%= data.content %></textarea>
 </div>
 
 <div class="section">
@@ -33,7 +30,8 @@
 </div>
 
 <div class="operations">
-  <i class="circular big inverted write icon operation submit"></i>
+  <i class="circular big inverted checkmark icon operation remember"></i>
+  <i class="circular big inverted remove icon operation not-remember"></i>
 </div>
 
 <div class="word-explain">

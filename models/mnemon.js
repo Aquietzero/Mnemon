@@ -74,6 +74,10 @@ MnemonSchema.statics.pick = (user, deck, n=1, callback) => {
             let period = _.find(periods, {name: box});
             let timeBound = new Date(_.now() - period.seconds * 1000);
 
+            console.log({
+                user: user, deck: deck, box: box,
+                //$updated_at: {$lt: timeBound}
+            });
             Model.mnemon.find({
                 user: user, deck: deck, box: box,
                 //$updated_at: {$lt: timeBound}

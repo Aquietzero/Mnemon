@@ -5,12 +5,16 @@ Mousetrap = require 'mousetrap'
 require './review.css'
 
 Card = require '../card/card.coffee'
-CardView = require '../card/card_view.coffee'
+ReviewCardView = require '../review_card/review_card_view.coffee'
 
 template = require './review.ejs'
 
 class ReviewView extends Backbone.View
     className: 'review-flow'
+
+    events:
+        'click .remember': 'remember'
+        'click .not-remember': 'notRemember'
 
     constructor: (options) ->
         super
@@ -18,17 +22,14 @@ class ReviewView extends Backbone.View
 
         @cards = []
         @currentCard
+        @n = 20
         @currentIndex = 0
         @deck = options?.deck || 'default'
-        q = deck: @deck
 
-        @query =
-            q: q
-            page: 0
-            limit: 20
-
-        Mousetrap.bind 'left', @prevCard.bind @
-        Mousetrap.bind 'right', @nextCard.bind @
+        # Mousetrap.bind 'left', @prevCard.bind @
+        # Mousetrap.bind 'right', @nextCard.bind @
+        Mousetrap.bind 'n', @remember.bind @
+        Mousetrap.bind 'p', @notRemember.bind @
 
         @fetch()
 
@@ -38,9 +39,11 @@ class ReviewView extends Backbone.View
 
     fetch: ->
         $.ajax
-            url: '/cards'
+            url: '/review/pick'
             method: 'post'
-            data: query: JSON.stringify @query
+            data:
+                deck: @deck
+                n: @n
             success: (res) =>
                 unless res.data && res.data.length > 0
                     return alert 'Last Card.'
@@ -54,7 +57,7 @@ class ReviewView extends Backbone.View
             delete @currentCard
 
         card = new Card(card)
-        @currentCard = cardView = new CardView(model: card)
+        @currentCard = cardView = new ReviewCardView(model: card)
         @$('.current-card').html cardView.render().el
 
     nextCard: ->
@@ -65,7 +68,6 @@ class ReviewView extends Backbone.View
         if @cards[@currentIndex]
             @addACard @cards[@currentIndex]
         else
-            @query.page++
             @fetch()
 
     prevCard: ->
@@ -75,5 +77,9 @@ class ReviewView extends Backbone.View
         @currentIndex--
         if @cards[@currentIndex]
             @addACard @cards[@currentIndex]
+
+    remember: ->
+
+    notRemember: ->
 
 module.exports = ReviewView

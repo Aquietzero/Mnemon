@@ -68,7 +68,7 @@
 
 	ReviewView = __webpack_require__(51);
 
-	HelpView = __webpack_require__(55);
+	HelpView = __webpack_require__(59);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -19482,9 +19482,9 @@
 	function print() { __p += __j.call(arguments, '') }
 	__p += '<div class="section">\n  <div class="right floated content autofill">\n    <i class="camera retro middle aligned icon remove-card"></i>\n  </div>\n  <input class="title" name="title" type="text" value="' +
 	((__t = ( data.title )) == null ? '' : __t) +
-	'" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
+	'" placeholder="Word" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
-	'" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea class="explain" id="" name="explain">' +
+	'" placeholder="Noun" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea class="explain" id="" name="explain">' +
 	((__t = ( data.explain )) == null ? '' : __t) +
 	'</textarea>\n</div>\n\n<div class="section">\n  <textarea class="content" id="" name="content">' +
 	((__t = ( data.content )) == null ? '' : __t) +
@@ -19546,9 +19546,9 @@
 
 	  Card.prototype.defaults = {
 	    deck: 'default',
-	    title: 'Word',
+	    title: '',
 	    explain: 'A basic unit to express something.',
-	    sub_title: 'Noun',
+	    sub_title: '',
 	    content: 'Words build sentences, which build a language.',
 	    tags: [],
 	    connections: [],
@@ -19968,15 +19968,20 @@
 
 	  DecksView.prototype.preview = function(e) {
 	    var $entry, deck, deckView, name;
+	    if (this.deckPreivew) {
+	      this.deckPreivew.remove();
+	      delete this.deckPreivew;
+	    }
 	    $entry = $(e.currentTarget);
 	    name = $entry.attr('id');
 	    deck = this.collection.findWhere({
 	      name: name
 	    });
-	    deckView = new DeckView({
+	    this.deckPreivew = deckView = new DeckView({
 	      model: deck
 	    });
-	    return this.$('.deck-preview').html(deckView.render().el);
+	    this.$('.deck-preview').html(deckView.render().el);
+	    return deckView.fetchReviewStats();
 	  };
 
 	  return DecksView;
@@ -20021,7 +20026,7 @@
 
 
 	// module
-	exports.push([module.id, ".add-a-deck .form {\n  margin: 20px 0;\n}\n\n.add-a-deck .form.hide {\n  display: none;\n}\n\n.decks-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n", ""]);
+	exports.push([module.id, ".add-a-deck .form {\n  margin: 20px 0;\n}\n\n.add-a-deck .form.hide {\n  display: none;\n}\n\n.deck-detial .stats {\n  margin-top: 20px;\n}\n\n.decks-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n", ""]);
 
 	// exports
 
@@ -20103,15 +20108,55 @@
 	DeckView = (function(superClass) {
 	  extend(DeckView, superClass);
 
-	  function DeckView() {
-	    return DeckView.__super__.constructor.apply(this, arguments);
-	  }
-
 	  DeckView.prototype.className = 'deck-detail';
 
+	  DeckView.prototype.events = {
+	    'click .setup-review': 'setupReview',
+	    'click .start-review': 'startReview'
+	  };
+
+	  function DeckView(opts) {
+	    DeckView.__super__.constructor.call(this, opts);
+	    this.reviewStats = {
+	      setup: false,
+	      stats: {}
+	    };
+	  }
+
 	  DeckView.prototype.render = function() {
-	    this.$el.html(template(this.model.toJSON()));
+	    this.$el.html(template(_.extend(this.model.toJSON(), {
+	      reviewStats: this.reviewStats
+	    })));
 	    return this;
+	  };
+
+	  DeckView.prototype.fetchReviewStats = function() {
+	    return $.ajax({
+	      url: "/review/" + (this.model.get('name')) + "/statistics",
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(res.err);
+	          }
+	          _this.reviewStats = res.data;
+	          return _this.render();
+	        };
+	      })(this)
+	    });
+	  };
+
+	  DeckView.prototype.setupReview = function() {
+	    return $.ajax({
+	      url: "/review/" + (this.model.get('name')) + "/setup",
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(res.err);
+	          }
+	          return _this.fetchReviewStats();
+	        };
+	      })(this)
+	    });
 	  };
 
 	  return DeckView;
@@ -20166,7 +20211,8 @@
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
-	var __t, __p = '';
+	var __t, __p = '', __j = Array.prototype.join;
+	function print() { __p += __j.call(arguments, '') }
 	__p += '<div class="basic-info">\n  <h1>' +
 	((__t = ( data.name )) == null ? '' : __t) +
 	'</h1>\n  <p>' +
@@ -20177,7 +20223,21 @@
 	((__t = ( data.name )) == null ? '' : __t) +
 	'/review">\n      <i class="left unhide icon"></i>\n      View\n    </a>\n    <div class="or"></div>\n    <a class="ui button" href="/#decks/' +
 	((__t = ( data.name )) == null ? '' : __t) +
-	'/cards">\n      Edit\n      <i class="right edit icon"></i>\n    </a>\n  </div>\n\n  <hr>\n  <div class="ui button black large">Start Review</div>\n</div>\n';
+	'/cards">\n      Edit\n      <i class="right edit icon"></i>\n    </a>\n  </div>\n\n  <hr>\n\n  ';
+	 if (!data.reviewStats.setup) { ;
+	__p += '\n    <div class="ui button black large setup-review">Setup Review Schedule</div>\n  ';
+	 } else { ;
+	__p += '\n    <div class="ui button black large start-review">Start Review</div>\n\n    <div class="stats">\n      ';
+	 for (period in data.reviewStats.stats) { ;
+	__p += '\n        <div class="ui grid">\n          <div class="two wide column">\n            <div class="label">' +
+	((__t = ( period )) == null ? '' : __t) +
+	'</div>\n          </div>\n          <div class="fourteen wide column">\n            <div class="ui small black progress" data-percent="' +
+	((__t = ( Math.floor(100*data.reviewStats.stats[period] / data.number_of_cards) )) == null ? '' : __t) +
+	'">\n              <div class="bar"></div>\n            </div>\n          </div>\n        </div>\n      ';
+	 } ;
+	__p += '\n    </div>\n\n  ';
+	 } ;
+	__p += '\n</div>\n';
 	return __p
 	}
 
@@ -20185,7 +20245,7 @@
 /* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Card, CardView, Mousetrap, ReviewView, _, template,
+	var $, Backbone, Card, Mousetrap, ReviewCardView, ReviewView, _, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -20201,9 +20261,9 @@
 
 	Card = __webpack_require__(34);
 
-	CardView = __webpack_require__(26);
+	ReviewCardView = __webpack_require__(54);
 
-	template = __webpack_require__(54);
+	template = __webpack_require__(58);
 
 	ReviewView = (function(superClass) {
 	  extend(ReviewView, superClass);
@@ -20211,23 +20271,15 @@
 	  ReviewView.prototype.className = 'review-flow';
 
 	  function ReviewView(options) {
-	    var q;
 	    ReviewView.__super__.constructor.apply(this, arguments);
 	    console.log('init reviews.');
 	    this.cards = [];
 	    this.currentCard;
+	    this.n = 20;
 	    this.currentIndex = 0;
 	    this.deck = (options != null ? options.deck : void 0) || 'default';
-	    q = {
-	      deck: this.deck
-	    };
-	    this.query = {
-	      q: q,
-	      page: 0,
-	      limit: 20
-	    };
-	    Mousetrap.bind('left', this.prevCard.bind(this));
-	    Mousetrap.bind('right', this.nextCard.bind(this));
+	    Mousetrap.bind('n', this.remember.bind(this));
+	    Mousetrap.bind('p', this.notRemember.bind(this));
 	    this.fetch();
 	  }
 
@@ -20238,10 +20290,11 @@
 
 	  ReviewView.prototype.fetch = function() {
 	    return $.ajax({
-	      url: '/cards',
+	      url: '/review/pick',
 	      method: 'post',
 	      data: {
-	        query: JSON.stringify(this.query)
+	        deck: this.deck,
+	        n: this.n
 	      },
 	      success: (function(_this) {
 	        return function(res) {
@@ -20262,7 +20315,7 @@
 	      delete this.currentCard;
 	    }
 	    card = new Card(card);
-	    this.currentCard = cardView = new CardView({
+	    this.currentCard = cardView = new ReviewCardView({
 	      model: card
 	    });
 	    return this.$('.current-card').html(cardView.render().el);
@@ -20290,6 +20343,10 @@
 	      return this.addACard(this.cards[this.currentIndex]);
 	    }
 	  };
+
+	  ReviewView.prototype.remember = function() {};
+
+	  ReviewView.prototype.notRemember = function() {};
 
 	  return ReviewView;
 
@@ -20340,6 +20397,123 @@
 
 /***/ },
 /* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $, Backbone, Card, Mousetrap, ReviewCardView, _, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(22);
+
+	Backbone = __webpack_require__(18);
+
+	Mousetrap = __webpack_require__(27);
+
+	__webpack_require__(55);
+
+	template = __webpack_require__(57);
+
+	Card = __webpack_require__(34);
+
+	ReviewCardView = (function(superClass) {
+	  extend(ReviewCardView, superClass);
+
+	  ReviewCardView.prototype.className = 'card';
+
+	  function ReviewCardView(options) {
+	    if (options == null) {
+	      options = {
+	        model: new Card()
+	      };
+	    }
+	    ReviewCardView.__super__.constructor.apply(this, arguments);
+	    console.log('init review card.');
+	    this.model = options.model;
+	  }
+
+	  ReviewCardView.prototype.render = function() {
+	    this.$el.html(template(this.model.toJSON()));
+	    return this;
+	  };
+
+	  return ReviewCardView;
+
+	})(Backbone.View);
+
+	module.exports = ReviewCardView;
+
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(56);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./review_card.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./review_card.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 57 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '', __j = Array.prototype.join;
+	function print() { __p += __j.call(arguments, '') }
+	__p += '<div class="section">\n  <input class="title" name="title" type="text" value="' +
+	((__t = ( data.title )) == null ? '' : __t) +
+	'" disabled />\n  <input class="sub-title" name="sub_title" type="text" value="' +
+	((__t = ( data.sub_title )) == null ? '' : __t) +
+	'" disabled />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea disabled class="explain" id="" name="explain">' +
+	((__t = ( data.explain )) == null ? '' : __t) +
+	'</textarea>\n</div>\n\n<div class="section">\n  <textarea disabled class="content" id="" name="content">' +
+	((__t = ( data.content )) == null ? '' : __t) +
+	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" name="memory_aids" type="text" value="' +
+	((__t = ( data.memory_aids )) == null ? '' : __t) +
+	'" placeholder="What? It\\\'s a word.">\n  </div>\n</div>\n\n<div class="section">\n  ';
+	 if (data.connections && data.connections.length > 0) { ;
+	__p += '\n    <div class="connections-section">\n      <div class="header">connections</div>\n      <input class="connections" type="text" value="' +
+	((__t = ( data.connections )) == null ? '' : __t) +
+	'">\n    </div>\n  ';
+	 } ;
+	__p += '\n</div>\n\n<div class="operations">\n  <i class="circular big inverted checkmark icon operation remember"></i>\n  <i class="circular big inverted remove icon operation not-remember"></i>\n</div>\n\n<div class="word-explain">\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 58 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -20349,7 +20523,7 @@
 	}
 
 /***/ },
-/* 55 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, HelpView, _, template,
@@ -20362,9 +20536,9 @@
 
 	Backbone = __webpack_require__(18);
 
-	__webpack_require__(56);
+	__webpack_require__(60);
 
-	template = __webpack_require__(58);
+	template = __webpack_require__(62);
 
 	HelpView = (function(superClass) {
 	  extend(HelpView, superClass);
@@ -20389,13 +20563,13 @@
 
 
 /***/ },
-/* 56 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(57);
+	var content = __webpack_require__(61);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -20415,7 +20589,7 @@
 	}
 
 /***/ },
-/* 57 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -20429,7 +20603,7 @@
 
 
 /***/ },
-/* 58 */
+/* 62 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {

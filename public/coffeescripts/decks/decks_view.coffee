@@ -79,11 +79,16 @@ class DecksView extends Backbone.View
                 @collection.unshift res.data
 
     preview: (e) ->
+        if @deckPreivew
+            @deckPreivew.remove()
+            delete @deckPreivew
+
         $entry = $(e.currentTarget)
         name = $entry.attr 'id'
         deck = @collection.findWhere name: name
-        deckView = new DeckView(model: deck)
+        @deckPreivew = deckView = new DeckView(model: deck)
         @$('.deck-preview').html deckView.render().el
+        deckView.fetchReviewStats()
 
 
 module.exports = DecksView

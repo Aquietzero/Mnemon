@@ -6,6 +6,10 @@
   display: none;
 }
 
+.deck-detial .stats {
+  margin-top: 20px;
+}
+
 .decks-list {
   min-height: 100%;
   border-right: solid 1px #999;
