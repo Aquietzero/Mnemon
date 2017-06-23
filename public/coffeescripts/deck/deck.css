@@ -1,3 +1,14 @@
 .deck-detail .basic-info {
   text-align: center;
 }
+
+.deck-detail .stats {
+  margin-top: 20px;
+}
+
+.deck-detail .stats .column {
+  padding-top: 0 !important;
+}
+.deck-detail .stats .progress {
+  margin: 0;
+}

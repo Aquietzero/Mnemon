@@ -26,10 +26,10 @@ class ReviewView extends Backbone.View
         @currentIndex = 0
         @deck = options?.deck || 'default'
 
-        # Mousetrap.bind 'left', @prevCard.bind @
+        Mousetrap.bind 'left', @prevCard.bind @
         # Mousetrap.bind 'right', @nextCard.bind @
-        Mousetrap.bind 'n', @remember.bind @
-        Mousetrap.bind 'p', @notRemember.bind @
+        Mousetrap.bind 'up', @remember.bind @
+        Mousetrap.bind 'down', @notRemember.bind @
 
         @fetch()
 
@@ -46,9 +46,11 @@ class ReviewView extends Backbone.View
                 n: @n
             success: (res) =>
                 unless res.data && res.data.length > 0
-                    return alert 'Last Card.'
+                    return alert 'No cards to review'
 
-                @cards = _.union @cards, res.data
+                # @cards = _.union @cards, res.data
+                @cards = res.data
+                @currentIndex = 0
                 @addACard @cards[@currentIndex]
 
     addACard: (card) ->
@@ -79,7 +81,23 @@ class ReviewView extends Backbone.View
             @addACard @cards[@currentIndex]
 
     remember: ->
+        card = @currentCard.model.get 'title'
+        @rememberACard card, true
 
     notRemember: ->
+        card = @currentCard.model.get 'title'
+        @rememberACard card, false
+
+    rememberACard: (card, remembered) ->
+        $.ajax
+            url: '/review/put'
+            method: 'post'
+            data:
+                deck: @deck
+                card: card
+                remembered: remembered
+            success: (res) =>
+                return alert res.error unless res.message is 'ok'
+                @nextCard()
 
 module.exports = ReviewView

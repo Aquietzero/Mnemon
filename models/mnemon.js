@@ -76,18 +76,18 @@ MnemonSchema.statics.pick = (user, deck, n=1, callback) => {
 
             console.log({
                 user: user, deck: deck, box: box,
-                //$updated_at: {$lt: timeBound}
+                updated_at: {$lt: timeBound}
             });
             Model.mnemon.find({
                 user: user, deck: deck, box: box,
-                //$updated_at: {$lt: timeBound}
+                updated_at: {$lt: timeBound}
             }).sort({updated_at: -1}).limit(n).exec((err, mnemons) => {
                 _.each(mnemons, (m) => {
                     cards.push(m.card);
                 });
 
                 if (cards.length >= n) return cb(null, cards);
-                cb();
+                cb('No enough, keep getting cards from box.');
             });
         }
     }
@@ -104,17 +104,17 @@ MnemonSchema.statics.pick = (user, deck, n=1, callback) => {
 }
 
 // Put a card into the previous box if it is not remembered otherwise it goes into the next box.
-MnemonSchema.statics.put = function (user, deck, card, remembered, callback) {
-    this.findOne({user: user, deck: deck, card: card}, function (err, mnemon) {
+MnemonSchema.statics.put = (user, deck, card, remembered, callback) => {
+    Model.mnemon.findOne({user: user, deck: deck, card: card}, (err, mnemon) => {
         if (err || !mnemon) return callback(err || 'No mnemon.');
 
-        var currBox = mnemon.box;
-        var currIndex = _.findIndex(periods, {name: currBox});
+        let currBox = mnemon.box;
+        let currIndex = _.findIndex(periods, {name: currBox});
 
-        var prevBox = currIndex == 0 ? currBox : periods[currIndex-1].name;
-        var nextBox = currIndex == periods.length - 1 ? currBox : periods[currIndex+1].name;
+        let prevBox = currIndex == 0 ? currBox : periods[currIndex-1].name;
+        let nextBox = currIndex == periods.length - 1 ? currBox : periods[currIndex+1].name;
 
-        var box = remembered ? nextBox : prevBox;
+        let box = remembered ? nextBox : prevBox;
         mnemon.box = box;
         mnemon.save(callback);
     });

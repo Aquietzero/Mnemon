@@ -27,18 +27,18 @@
     <div class="ui button black large start-review">Start Review</div>
 
     <div class="stats">
-      <% for (period in data.reviewStats.stats) { %>
-        <div class="ui grid">
-          <div class="two wide column">
-            <div class="label"><%= period %></div>
+      <% data.reviewStats.stats.forEach(function (s) { %>
+        <div class="ui right aligned padded grid">
+          <div class="three wide column">
+            <div class="label"><%= s.display %></div>
           </div>
-          <div class="fourteen wide column">
-            <div class="ui small black progress" data-percent="<%= Math.floor(100*data.reviewStats.stats[period] / data.number_of_cards) %>">
+          <div class="thirteen wide column">
+            <div class="ui small black progress" data-percent="<%= s.percent %>">
               <div class="bar"></div>
             </div>
           </div>
         </div>
-      <% } %>
+      <% }) %>
     </div>
 
   <% } %>

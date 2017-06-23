@@ -27,10 +27,15 @@ module.exports = function (app) {
 
                 if (mnemons.length == 0) return res.send({message: 'ok', data: {setup: false, stats: {}}});
 
-                let stats = _.countBy(mnemons, 'box');
+                let stats = [];
+                let count = _.countBy(mnemons, 'box');
 
-                _.each(_.map(periods, 'name'), (p) => {
-                    stats[p] = stats[p] || 0;
+                // Using array to maintain order.
+                _.each(periods, (p) => {
+                    stats.push({
+                        display: p.display,
+                        percent: Math.floor(100*(count[p.name] || 0) / mnemons.length),
+                    });
                 });
 
                 res.send({
@@ -44,8 +49,6 @@ module.exports = function (app) {
         },
 
         pick: (req, res) => {
-            console.log(req.body);
-
             let deck = req.body.deck;
             let n = parseInt(req.body.n || 20);
             let user = 'zero';
@@ -55,9 +58,24 @@ module.exports = function (app) {
             Model.mnemon.pick(user, deck, n, (err, cardTitles) => {
                 Model.card.find({title: {$in: cardTitles}}, function (err, cards) {
                     if (err) return res.send({message: 'failed', error: err});
-
                     res.send({message: 'ok', data: cards});
                 });
+            });
+        },
+
+        put: (req, res) => {
+            let deck = req.body.deck;
+            let card = req.body.card;
+            let user = 'zero';
+            let remembered = req.body.remembered || false;
+
+            if (!deck || !card || !user) {
+                return res.send({message: 'failed', error: 'lack of arguments.'});
+            }
+
+            Model.mnemon.put(user, deck, card, remembered, (err) => {
+                if (err) return res.send({message: 'failed', error: err});
+                res.send({message: 'ok'});
             });
         },
     }

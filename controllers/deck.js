@@ -12,6 +12,7 @@ module.exports = function (app) {
             .find(query.q)
             .skip(query.skip)
             .limit(query.limit)
+            .sort({_id: -1})
             .exec(function (err, decks) {
                 if (err) return res.send({message: 'failed', error: err});
 

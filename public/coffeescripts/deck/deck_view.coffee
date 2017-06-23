@@ -18,6 +18,7 @@ class DeckView extends Backbone.View
 
     render: ->
         @$el.html template(_.extend @model.toJSON(), reviewStats: @reviewStats)
+        @$('.stats .progress').each (index, el) => window.$(el).progress()
         @
 
     fetchReviewStats: ->

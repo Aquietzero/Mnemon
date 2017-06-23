@@ -20037,7 +20037,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="eight wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="eight wide column deck-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui padded grid">\n  <div class="six wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column deck-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
@@ -20127,6 +20127,11 @@
 	    this.$el.html(template(_.extend(this.model.toJSON(), {
 	      reviewStats: this.reviewStats
 	    })));
+	    this.$('.stats .progress').each((function(_this) {
+	      return function(index, el) {
+	        return window.$(el).progress();
+	      };
+	    })(this));
 	    return this;
 	  };
 
@@ -20201,7 +20206,7 @@
 
 
 	// module
-	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n", ""]);
+	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n\n.deck-detail .stats {\n  margin-top: 20px;\n}\n\n.deck-detail .stats .column {\n  padding-top: 0 !important;\n}\n.deck-detail .stats .progress {\n  margin: 0;\n}\n", ""]);
 
 	// exports
 
@@ -20228,13 +20233,13 @@
 	__p += '\n    <div class="ui button black large setup-review">Setup Review Schedule</div>\n  ';
 	 } else { ;
 	__p += '\n    <div class="ui button black large start-review">Start Review</div>\n\n    <div class="stats">\n      ';
-	 for (period in data.reviewStats.stats) { ;
-	__p += '\n        <div class="ui grid">\n          <div class="two wide column">\n            <div class="label">' +
-	((__t = ( period )) == null ? '' : __t) +
-	'</div>\n          </div>\n          <div class="fourteen wide column">\n            <div class="ui small black progress" data-percent="' +
-	((__t = ( Math.floor(100*data.reviewStats.stats[period] / data.number_of_cards) )) == null ? '' : __t) +
+	 data.reviewStats.stats.forEach(function (s) { ;
+	__p += '\n        <div class="ui right aligned padded grid">\n          <div class="three wide column">\n            <div class="label">' +
+	((__t = ( s.display )) == null ? '' : __t) +
+	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui small black progress" data-percent="' +
+	((__t = ( s.percent )) == null ? '' : __t) +
 	'">\n              <div class="bar"></div>\n            </div>\n          </div>\n        </div>\n      ';
-	 } ;
+	 }) ;
 	__p += '\n    </div>\n\n  ';
 	 } ;
 	__p += '\n</div>\n';
@@ -20270,6 +20275,11 @@
 
 	  ReviewView.prototype.className = 'review-flow';
 
+	  ReviewView.prototype.events = {
+	    'click .remember': 'remember',
+	    'click .not-remember': 'notRemember'
+	  };
+
 	  function ReviewView(options) {
 	    ReviewView.__super__.constructor.apply(this, arguments);
 	    console.log('init reviews.');
@@ -20278,8 +20288,9 @@
 	    this.n = 20;
 	    this.currentIndex = 0;
 	    this.deck = (options != null ? options.deck : void 0) || 'default';
-	    Mousetrap.bind('n', this.remember.bind(this));
-	    Mousetrap.bind('p', this.notRemember.bind(this));
+	    Mousetrap.bind('left', this.prevCard.bind(this));
+	    Mousetrap.bind('up', this.remember.bind(this));
+	    Mousetrap.bind('down', this.notRemember.bind(this));
 	    this.fetch();
 	  }
 
@@ -20299,9 +20310,10 @@
 	      success: (function(_this) {
 	        return function(res) {
 	          if (!(res.data && res.data.length > 0)) {
-	            return alert('Last Card.');
+	            return alert('No cards to review');
 	          }
-	          _this.cards = _.union(_this.cards, res.data);
+	          _this.cards = res.data;
+	          _this.currentIndex = 0;
 	          return _this.addACard(_this.cards[_this.currentIndex]);
 	        };
 	      })(this)
@@ -20329,7 +20341,6 @@
 	    if (this.cards[this.currentIndex]) {
 	      return this.addACard(this.cards[this.currentIndex]);
 	    } else {
-	      this.query.page++;
 	      return this.fetch();
 	    }
 	  };
@@ -20344,9 +20355,37 @@
 	    }
 	  };
 
-	  ReviewView.prototype.remember = function() {};
+	  ReviewView.prototype.remember = function() {
+	    var card;
+	    card = this.currentCard.model.get('title');
+	    return this.rememberACard(card, true);
+	  };
 
-	  ReviewView.prototype.notRemember = function() {};
+	  ReviewView.prototype.notRemember = function() {
+	    var card;
+	    card = this.currentCard.model.get('title');
+	    return this.rememberACard(card, false);
+	  };
+
+	  ReviewView.prototype.rememberACard = function(card, remembered) {
+	    return $.ajax({
+	      url: '/review/put',
+	      method: 'post',
+	      data: {
+	        deck: this.deck,
+	        card: card,
+	        remembered: remembered
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(res.error);
+	          }
+	          return _this.nextCard();
+	        };
+	      })(this)
+	    });
+	  };
 
 	  return ReviewView;
 
