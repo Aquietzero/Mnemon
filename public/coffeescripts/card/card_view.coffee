@@ -6,10 +6,13 @@ require './card.css'
 
 event = require '../event.coffee'
 socket = require '../socket.coffee'
+ajax = require '../ajax.coffee'
 
 template = require './card.ejs'
 explainTemplate = require './word_explain.ejs'
+
 Card = require './card.coffee'
+TagsEditorView = require '../tags_editor/tags_editor.coffee'
 
 class CardView extends Backbone.View
     className: 'card'
@@ -28,22 +31,26 @@ class CardView extends Backbone.View
         if options && options.title
             @fetch options.title
 
+        @connectionsEditor = new TagsEditorView()
+
         socket.on 'searched:word', (res) =>
             unless res.err
                 @wordExplain = res.data
                 @renderWordExplain res.data
 
-        @listenTo @model, 'change', @render.bind(@)
+        @listenTo @model, 'change', @render.bind @
 
         Mousetrap.bind 'option+c', @autoFillCard.bind @
         Mousetrap.bind 'option+s', @submit.bind @
 
     render: ->
         @$el.html template(@model.toJSON())
+        @$('.connections').html @connectionsEditor.render().el
+        @connectionsEditor.setTags(@model.get 'connections')
         @
 
     fetch: (title) ->
-        $.ajax
+        ajax
             url: '/cards/detail'
             data: {title: title}
             method: 'post'
@@ -64,9 +71,12 @@ class CardView extends Backbone.View
         @searchWord() if key is 'title'
 
     submit: ->
-        $.ajax
+        data = _.omit(@model.toJSON(), '_id')
+        data.connections = @connectionsEditor.getTags()
+
+        ajax
             url: '/cards/update'
-            data: _.omit(@model.toJSON(), '_id')
+            data: data
             method: 'post'
             success: (res) =>
                 unless res.message is 'ok'

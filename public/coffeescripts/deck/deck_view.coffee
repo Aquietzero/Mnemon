@@ -1,5 +1,5 @@
 $ = require 'jquery'
-_ = require 'underscore'
+_ = require 'lodash'
 Backbone = require 'backbone'
 require './deck.css'
 
@@ -35,5 +35,8 @@ class DeckView extends Backbone.View
             success: (res) =>
                 return alert res.err unless res.message is 'ok'
                 @fetchReviewStats()
+
+    startReview: ->
+        window.location = "/#decks/#{@model.get 'name'}/review"
 
 module.exports = DeckView

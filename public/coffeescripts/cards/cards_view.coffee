@@ -1,10 +1,11 @@
 $ = require 'jquery'
-_ = require 'underscore'
+_ = require 'lodash'
 Backbone = require 'backbone'
 Mousetrap = require 'mousetrap'
 require './cards.css'
 
 event = require '../event.coffee'
+ajax = require '../ajax.coffee'
 
 template = require './cards.ejs'
 card_entry_template = require './card_entry.ejs'
@@ -51,7 +52,7 @@ class CardsView extends Backbone.View
         event.on 'card:create', (c) => @collection.unshift c
 
         # keyboard shortcuts.
-        Mousetrap.bind 'option+n', @addACard
+        Mousetrap.bind 'option+n', @addACard.bind @
 
         @fetch()
 
@@ -69,10 +70,11 @@ class CardsView extends Backbone.View
         @
 
     fetch: ->
-        $.ajax
+        ajax
             url: '/cards'
             method: 'post'
-            data: query: JSON.stringify @query
+            data:
+                query: @query
             success: (res) =>
                 @collection.add res.data
                 @adjustSearchBar()

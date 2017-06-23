@@ -1,0 +1,10 @@
+<% data.tags.forEach(function (tag) { %>
+  <span class="ui label" name="<%= tag.name %>">
+    <%= tag.name %>
+    <i class="delete icon"></i>
+  </span>
+<% }) %>
+<span class="ui label toggle-edit">
+  Add
+  <i class="add square icon"></i>
+</span>

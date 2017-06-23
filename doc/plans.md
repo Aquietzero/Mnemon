@@ -20,12 +20,12 @@ Principles:
 
 ## Basic functions
 
-+ Create and update cards.
-+ View and search all cards.
+- Create and update cards.
+- View and search all cards.
 + Auto connection suggestions while create or update cards.
-+ Basic memory flow and statistics.
+- Basic memory flow and statistics.
 
-+ Keyword shortcuts to enhance the speed of creating cards.
+- Keyword shortcuts to enhance the speed of creating cards.
 
 ## Leitner system
 
@@ -74,6 +74,10 @@ Deck page is an important transition page from deck list to review flow. Since n
 + If the deck is not under a review, show a button for review setup.
 + If the deck is under review, show numbers of cards in each stage.
 
+#### Control hidden part of a card
+
+Each card should be able to control the show and hide of each part.
+
 ### Think about grammar connection
 
 Grammars with similar ideas should be grouped together. Differences between these grammars should be pointed out in detail.
@@ -87,4 +91,7 @@ Tag types:
 + meaning
 + reference
 
+## Connection with other words or grammars
 
+1. **When creating a card**: Connections can be added manually in the form of simple text.
+2. **When loading a card**: Check to see whether each connection has a corresponding card. If yes, then also load the card, or just allow to click a link the connected card.

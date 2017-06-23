@@ -5,8 +5,10 @@ var Model = require('../model');
 module.exports = function (app) {
     return {
         all: function (req, res) {
+            console.log(req.body);
+
             var defaultQ = {q: {}, limit: 20, page: 0};
-            var query = _.extend(defaultQ, JSON.parse(req.body.query) || {});
+            var query = _.extend(defaultQ, req.body.query || {});
 
             Model.card
             .find(query.q)
@@ -41,6 +43,8 @@ module.exports = function (app) {
 
         update: function (req, res) {
             var title = req.body.title;
+
+            console.log(req.body);
 
             if (!title) {
                 return res.send({message: 'failed', error: 'lack of arguments.'});
