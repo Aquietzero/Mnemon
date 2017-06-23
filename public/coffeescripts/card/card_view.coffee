@@ -22,26 +22,27 @@ class CardView extends Backbone.View
         'change textarea': 'updateModel'
         'click .submit': 'submit'
         'click .autofill': 'autoFillCard'
+        'click .tag-item': 'gotoConnection'
 
     constructor: (options) ->
-        super options
+        super
         console.log 'init card.'
 
         @model = options.model || new Card()
-        if options && options.title
-            @fetch options.title
-
         @connectionsEditor = new TagsEditorView()
 
         socket.on 'searched:word', (res) =>
             unless res.err
                 @wordExplain = res.data
                 @renderWordExplain res.data
+                @autoFillCard() unless @model.get 'content'
 
         @listenTo @model, 'change', @render.bind @
 
         Mousetrap.bind 'option+c', @autoFillCard.bind @
         Mousetrap.bind 'option+s', @submit.bind @
+
+        @fetch options.title if options && options.title
 
     render: ->
         @$el.html template(@model.toJSON())
@@ -82,7 +83,6 @@ class CardView extends Backbone.View
                 unless res.message is 'ok'
                     return alert JSON.stringify(res.error)
                 event.trigger 'card:create', new Card(res.data)
-                # window.location = "/#cards/detail/#{res.data.title}"
 
     searchWord: (e) ->
         title = @$('.title').val()
@@ -122,5 +122,9 @@ class CardView extends Backbone.View
         @model.set 'content', _.pluck(explains, 'content').join('\r\r')
 
         console.log @model.toJSON()
+
+    gotoConnection: (e) ->
+        conn = $(e.currentTarget).attr 'name'
+        window.location = "/#decks/#{@model.get 'deck'}/cards/#{conn}"
 
 module.exports = CardView

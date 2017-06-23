@@ -18222,28 +18222,32 @@
 	    'change input': 'updateModel',
 	    'change textarea': 'updateModel',
 	    'click .submit': 'submit',
-	    'click .autofill': 'autoFillCard'
+	    'click .autofill': 'autoFillCard',
+	    'click .tag-item': 'gotoConnection'
 	  };
 
 	  function CardView(options) {
-	    CardView.__super__.constructor.call(this, options);
+	    CardView.__super__.constructor.apply(this, arguments);
 	    console.log('init card.');
 	    this.model = options.model || new Card();
-	    if (options && options.title) {
-	      this.fetch(options.title);
-	    }
 	    this.connectionsEditor = new TagsEditorView();
 	    socket.on('searched:word', (function(_this) {
 	      return function(res) {
 	        if (!res.err) {
 	          _this.wordExplain = res.data;
-	          return _this.renderWordExplain(res.data);
+	          _this.renderWordExplain(res.data);
+	          if (!_this.model.get('content')) {
+	            return _this.autoFillCard();
+	          }
 	        }
 	      };
 	    })(this));
 	    this.listenTo(this.model, 'change', this.render.bind(this));
 	    Mousetrap.bind('option+c', this.autoFillCard.bind(this));
 	    Mousetrap.bind('option+s', this.submit.bind(this));
+	    if (options && options.title) {
+	      this.fetch(options.title);
+	    }
 	  }
 
 	  CardView.prototype.render = function() {
@@ -18345,6 +18349,12 @@
 	    this.model.set('explain', briefExplains.join('\n'));
 	    this.model.set('content', _.pluck(explains, 'content').join('\r\r'));
 	    return console.log(this.model.toJSON());
+	  };
+
+	  CardView.prototype.gotoConnection = function(e) {
+	    var conn;
+	    conn = $(e.currentTarget).attr('name');
+	    return window.location = "/#decks/" + (this.model.get('deck')) + "/cards/" + conn;
 	  };
 
 	  return CardView;
@@ -36617,9 +36627,9 @@
 	((__t = ( data.title )) == null ? '' : __t) +
 	'" placeholder="Word" />\n  <input class="sub-title" name="sub_title" type="text" value="' +
 	((__t = ( data.sub_title )) == null ? '' : __t) +
-	'" placeholder="Noun" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea class="explain" id="" name="explain">' +
+	'" placeholder="Noun" />\n</div>\n\n<hr />\n\n<div class="section">\n  <textarea class="explain" id="" name="explain" placeholder="A basic unit to express something.">' +
 	((__t = ( data.explain )) == null ? '' : __t) +
-	'</textarea>\n</div>\n\n<div class="section">\n  <textarea class="content" id="" name="content">' +
+	'</textarea>\n</div>\n\n<div class="section">\n  <textarea class="content" id="" name="content" placeholder="Words build sentences, which build a language.">' +
 	((__t = ( data.content )) == null ? '' : __t) +
 	'</textarea>\n</div>\n\n<div class="section">\n  <div class="memory-aids-section">\n    <div class="header">memory aids</div>\n    <input class="memory-aids" name="memory_aids" type="text" value="' +
 	((__t = ( data.memory_aids )) == null ? '' : __t) +
@@ -36674,10 +36684,11 @@
 	  Card.prototype.defaults = {
 	    deck: 'default',
 	    title: '',
-	    explain: 'A basic unit to express something.',
+	    explain: '',
 	    sub_title: '',
-	    content: 'Words build sentences, which build a language.',
+	    content: '',
 	    tags: [],
+	    connections: [],
 	    connections: [],
 	    memory_aids: ''
 	  };
@@ -36884,7 +36895,7 @@
 	function print() { __p += __j.call(arguments, '') }
 
 	 data.tags.forEach(function (tag) { ;
-	__p += '\n  <span class="ui label" name="' +
+	__p += '\n  <span class="ui label tag-item" name="' +
 	((__t = ( tag.name )) == null ? '' : __t) +
 	'">\n    ' +
 	((__t = ( tag.name )) == null ? '' : __t) +
