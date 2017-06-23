@@ -34,7 +34,7 @@ class App extends Backbone.View
                 @currentPage = new CardView(title: params[0])
                 @$('.content').html @currentPage.render().el
             when 'cards'
-                @currentPage = new CardsView(deck: params[0])
+                @currentPage = new CardsView(deck: params[0], card: params[1])
                 @$('.content').html @currentPage.render().el
             when 'decks'
                 @currentPage = new DecksView()

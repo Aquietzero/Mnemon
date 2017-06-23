@@ -23,11 +23,11 @@ class CardView extends Backbone.View
         'click .submit': 'submit'
         'click .autofill': 'autoFillCard'
 
-    constructor: (options = model: new Card()) ->
-        super
+    constructor: (options) ->
+        super options
         console.log 'init card.'
 
-        @model = options.model
+        @model = options.model || new Card()
         if options && options.title
             @fetch options.title
 

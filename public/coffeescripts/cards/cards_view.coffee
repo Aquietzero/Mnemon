@@ -39,6 +39,7 @@ class CardsView extends Backbone.View
 
         @cardPreview
         @deck = options?.deck || 'default'
+        @card = options?.card
         q = deck: @deck
 
         @query =
@@ -67,6 +68,10 @@ class CardsView extends Backbone.View
 
         # window events.
         window.addEventListener 'resize', @adjustSearchBar
+
+        if @card
+            @cardPreview = cardView = new CardView(title: @card)
+            @$('.card-preview').html cardView.render().el
         @
 
     fetch: ->
@@ -102,6 +107,8 @@ class CardsView extends Backbone.View
         card = @collection.findWhere title: title
         @cardPreview = cardView = new CardView(model: card)
         @$('.card-preview').html cardView.render().el
+
+        Backbone.history.navigate "#decks/#{@deck}/cards/#{card.get 'title'}"
 
     addACard: ->
         if @cardPreview

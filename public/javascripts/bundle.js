@@ -98,7 +98,8 @@
 	        break;
 	      case 'cards':
 	        this.currentPage = new CardsView({
-	          deck: params[0]
+	          deck: params[0],
+	          card: params[1]
 	        });
 	        this.$('.content').html(this.currentPage.render().el);
 	        break;
@@ -16488,7 +16489,7 @@
 	    'cards/list': 'cards',
 	    'decks/list': 'decks',
 	    'decks/detail/:deck': 'deck',
-	    'decks/:deck/cards': 'cards',
+	    'decks/:deck/cards(/:card)': 'cards',
 	    'decks/:deck/review': 'review',
 	    'help': 'help'
 	  };
@@ -18225,14 +18226,9 @@
 	  };
 
 	  function CardView(options) {
-	    if (options == null) {
-	      options = {
-	        model: new Card()
-	      };
-	    }
-	    CardView.__super__.constructor.apply(this, arguments);
+	    CardView.__super__.constructor.call(this, options);
 	    console.log('init card.');
-	    this.model = options.model;
+	    this.model = options.model || new Card();
 	    if (options && options.title) {
 	      this.fetch(options.title);
 	    }
@@ -36972,6 +36968,7 @@
 	    console.log('init cards.');
 	    this.cardPreview;
 	    this.deck = (options != null ? options.deck : void 0) || 'default';
+	    this.card = options != null ? options.card : void 0;
 	    q = {
 	      deck: this.deck
 	    };
@@ -36998,9 +36995,16 @@
 	  };
 
 	  CardsView.prototype.render = function() {
+	    var cardView;
 	    this.$el.html(template());
 	    this.$('.cards-list').height($(window).height());
 	    window.addEventListener('resize', this.adjustSearchBar);
+	    if (this.card) {
+	      this.cardPreview = cardView = new CardView({
+	        title: this.card
+	      });
+	      this.$('.card-preview').html(cardView.render().el);
+	    }
 	    return this;
 	  };
 
@@ -37051,7 +37055,8 @@
 	    this.cardPreview = cardView = new CardView({
 	      model: card
 	    });
-	    return this.$('.card-preview').html(cardView.render().el);
+	    this.$('.card-preview').html(cardView.render().el);
+	    return Backbone.history.navigate("#decks/" + this.deck + "/cards/" + (card.get('title')));
 	  };
 
 	  CardsView.prototype.addACard = function() {

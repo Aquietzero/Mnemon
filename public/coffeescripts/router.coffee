@@ -7,7 +7,7 @@ class Router extends Backbone.Router
         'cards/list': 'cards' # View all cards.
         'decks/list': 'decks'
         'decks/detail/:deck': 'deck'
-        'decks/:deck/cards': 'cards' # View cards in a deck.
+        'decks/:deck/cards(/:card)': 'cards' # View cards in a deck.
         'decks/:deck/review': 'review' # Review cards of a deck.
 
         'help': 'help'
