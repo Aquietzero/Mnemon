@@ -1,7 +1,7 @@
 module.exports = {
     db: {
-        qtrader: {
-            name: 'mongodb://localhost/qtrader',
+        mnemon: {
+            name: 'mongodb://localhost/mnemon',
             opts: {}
         }
     }
