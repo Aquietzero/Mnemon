@@ -37714,7 +37714,8 @@
 
 	  ReviewView.prototype.events = {
 	    'click .remember': 'remember',
-	    'click .not-remember': 'notRemember'
+	    'click .not-remember': 'notRemember',
+	    'click .back-to-deck': 'backToDeck'
 	  };
 
 	  function ReviewView(options) {
@@ -37823,6 +37824,10 @@
 	        };
 	      })(this)
 	    });
+	  };
+
+	  ReviewView.prototype.backToDeck = function() {
+	    return window.location = "/#decks/detail/" + (this.currentCard.model.get('deck'));
 	  };
 
 	  return ReviewView;
