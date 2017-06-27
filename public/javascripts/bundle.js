@@ -37867,7 +37867,7 @@
 
 
 	// module
-	exports.push([module.id, ".review-flow .card {\n  margin: 30px auto;\n}\n", ""]);
+	exports.push([module.id, ".review-flow .card {\n  margin: 30px auto;\n}\n\n.back-to-deck {\n  position: fixed;\n  right: 20px;\n  top: 20px;\n}\n", ""]);
 
 	// exports
 
@@ -39130,7 +39130,7 @@
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="current-card"></div>\n';
+	__p += '<div class="current-card"></div>\n<div class="back-to-deck">\n  <i class="circular large inverted grid layout icon"></i>\n</div>\n';
 	return __p
 	}
 

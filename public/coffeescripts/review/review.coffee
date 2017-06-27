@@ -18,6 +18,7 @@ class ReviewView extends Backbone.View
     events:
         'click .remember': 'remember'
         'click .not-remember': 'notRemember'
+        'click .back-to-deck': 'backToDeck'
 
     constructor: (options) ->
         super
@@ -103,5 +104,8 @@ class ReviewView extends Backbone.View
             success: (res) =>
                 return alert res.error unless res.message is 'ok'
                 @nextCard()
+
+    backToDeck: ->
+        window.location = "/#decks/detail/#{@currentCard.model.get 'deck'}"
 
 module.exports = ReviewView
