@@ -12,6 +12,7 @@ Router = require './router.coffee'
 Dashboard = require './dashboard/dashboard.coffee'
 CardView = require './card/card_view.coffee'
 CardsView = require './cards/cards_view.coffee'
+DeckView = require './deck/deck_view.coffee'
 DecksView = require './decks/decks_view.coffee'
 ReviewView = require './review/review.coffee'
 HelpView = require './help/help.coffee'
@@ -40,6 +41,10 @@ class App extends Backbone.View
             when 'cards'
                 @currentPage = new CardsView(deck: params[0], card: params[1])
                 @$('.content').html @currentPage.render().el
+            when 'deck'
+                @currentPage = deckView = new DeckView(deck: params[0])
+                @$('.content').html @currentPage.render().el
+                deckView.fetchReviewStats()
             when 'decks'
                 @currentPage = new DecksView()
                 @$('.content').html @currentPage.render().el

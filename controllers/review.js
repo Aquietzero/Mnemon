@@ -22,28 +22,42 @@ module.exports = function (app) {
             let deck = req.params.deck;
             if (!deck) return res.send({message: 'failed', error: 'lack of arguments.'});
 
-            Model.mnemon.find({deck: deck}, (err, mnemons) => {
-                if (err) return res.send({message: 'failed', error: err});
+            // `setup` denotes whether the review flow is setup or not.
+            let data = {setup: false, deck: null, stats: []};
 
-                if (mnemons.length == 0) return res.send({message: 'ok', data: {setup: false, stats: {}}});
+            async.series([
+                function (next) {
+                    Model.deck.findOne({name: deck}, function (err, deck) {
+                        if (err || !deck) return next(err || 'deck does not exist.');
 
-                let stats = [];
-                let count = _.countBy(mnemons, 'box');
-
-                // Using array to maintain order.
-                _.each(periods, (p) => {
-                    stats.push({
-                        display: p.display,
-                        percent: Math.floor(100*(count[p.name] || 0) / mnemons.length),
+                        data.deck = deck;
+                        next();
                     });
-                });
+                },
+                function (next) {
+                    Model.mnemon.find({deck: deck}, (err, mnemons) => {
+                        if (err) return next(err);
 
+                        if (mnemons.length == 0) return next();
+
+                        let count = _.countBy(mnemons, 'box');
+                        data.setup = true;
+                        // Using array to maintain order.
+                        _.each(periods, (p) => {
+                            data.stats.push({
+                                display: p.display,
+                                percent: Math.floor(100*(count[p.name] || 0) / mnemons.length),
+                            });
+                        });
+
+                        next();
+                    });
+                }
+            ], function (err) {
+                if (err) return res.send({message: 'failed', error: err});
                 res.send({
                     message: 'ok',
-                    data: {
-                        setup: true,
-                        stats
-                    },
+                    data: data,
                 });
             });
         },

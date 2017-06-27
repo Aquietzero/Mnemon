@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, App, Backbone, CardView, CardsView, Dashboard, DecksView, HelpView, ReviewView, Router,
+	var $, App, Backbone, CardView, CardsView, Dashboard, DeckView, DecksView, HelpView, ReviewView, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -66,7 +66,9 @@
 
 	CardsView = __webpack_require__(45);
 
-	DecksView = __webpack_require__(51);
+	DeckView = __webpack_require__(51);
+
+	DecksView = __webpack_require__(56);
 
 	ReviewView = __webpack_require__(61);
 
@@ -86,6 +88,7 @@
 	  };
 
 	  App.prototype.renderPage = function(page, params) {
+	    var deckView;
 	    if (this.currentPage) {
 	      this.currentPage.remove();
 	      delete this.currentPage;
@@ -105,6 +108,13 @@
 	          card: params[1]
 	        });
 	        this.$('.content').html(this.currentPage.render().el);
+	        break;
+	      case 'deck':
+	        this.currentPage = deckView = new DeckView({
+	          deck: params[0]
+	        });
+	        this.$('.content').html(this.currentPage.render().el);
+	        deckView.fetchReviewStats();
 	        break;
 	      case 'decks':
 	        this.currentPage = new DecksView();
@@ -37235,6 +37245,208 @@
 /* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var $, Backbone, Deck, DeckView, _, template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(1);
+
+	_ = __webpack_require__(35);
+
+	Backbone = __webpack_require__(20);
+
+	__webpack_require__(52);
+
+	template = __webpack_require__(54);
+
+	Deck = __webpack_require__(55);
+
+	DeckView = (function(superClass) {
+	  extend(DeckView, superClass);
+
+	  DeckView.prototype.className = 'deck-detail';
+
+	  DeckView.prototype.events = {
+	    'click .setup-review': 'setupReview',
+	    'click .start-review': 'startReview'
+	  };
+
+	  function DeckView(opts) {
+	    DeckView.__super__.constructor.call(this, opts);
+	    this.reviewStats = {
+	      setup: false,
+	      stats: {}
+	    };
+	    if (opts.deck) {
+	      this.model = new Deck({
+	        name: opts.deck
+	      });
+	      this.fetchReviewStats();
+	    }
+	  }
+
+	  DeckView.prototype.render = function() {
+	    this.$el.html(template(_.extend(this.model.toJSON(), {
+	      reviewStats: this.reviewStats
+	    })));
+	    this.$('.stats .progress').each((function(_this) {
+	      return function(index, el) {
+	        return window.$(el).progress();
+	      };
+	    })(this));
+	    return this;
+	  };
+
+	  DeckView.prototype.fetchReviewStats = function() {
+	    return $.ajax({
+	      url: "/review/" + (this.model.get('name')) + "/statistics",
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(res.err);
+	          }
+	          _this.model.set(res.data.deck);
+	          _this.reviewStats = res.data;
+	          return _this.render();
+	        };
+	      })(this)
+	    });
+	  };
+
+	  DeckView.prototype.setupReview = function() {
+	    return $.ajax({
+	      url: "/review/" + (this.model.get('name')) + "/setup",
+	      success: (function(_this) {
+	        return function(res) {
+	          if (res.message !== 'ok') {
+	            return alert(res.err);
+	          }
+	          return _this.fetchReviewStats();
+	        };
+	      })(this)
+	    });
+	  };
+
+	  DeckView.prototype.startReview = function() {
+	    return window.location = "/#decks/" + (this.model.get('name')) + "/review";
+	  };
+
+	  return DeckView;
+
+	})(Backbone.View);
+
+	module.exports = DeckView;
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(53);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../../node_modules/css-loader/index.js!./deck.css", function() {
+				var newContent = require("!!../../../node_modules/css-loader/index.js!./deck.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n\n.deck-detail .stats {\n  margin-top: 20px;\n}\n\n.deck-detail .stats .column {\n  padding-top: 0 !important;\n}\n.deck-detail .stats .progress {\n  margin: 0;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 54 */
+/***/ function(module, exports) {
+
+	module.exports = function (data) {
+	var __t, __p = '', __j = Array.prototype.join;
+	function print() { __p += __j.call(arguments, '') }
+	__p += '<div class="basic-info">\n  <h1>' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'</h1>\n  <p>' +
+	((__t = ( data.description )) == null ? '' : __t) +
+	'</p>\n  <div class="ui one statistics">\n    <div class="blue statistic">\n      <div class="value">' +
+	((__t = ( data.number_of_cards )) == null ? '' : __t) +
+	'</div>\n      <div class="label">Cards</div>\n    </div>\n  </div>\n  <div class="ui buttons">\n    <a class="ui button" href="/#decks/' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'/review">\n      <i class="left unhide icon"></i>\n      View\n    </a>\n    <div class="or"></div>\n    <a class="ui button" href="/#decks/' +
+	((__t = ( data.name )) == null ? '' : __t) +
+	'/cards">\n      Edit\n      <i class="right edit icon"></i>\n    </a>\n  </div>\n\n  <hr>\n\n  ';
+	 if (!data.reviewStats.setup) { ;
+	__p += '\n    <div class="ui button black large setup-review">Setup Review Schedule</div>\n  ';
+	 } else { ;
+	__p += '\n    <div class="ui button black large start-review">Start Review</div>\n\n    <div class="stats">\n      ';
+	 data.reviewStats.stats.forEach(function (s) { ;
+	__p += '\n        <div class="ui right aligned padded grid">\n          <div class="three wide column">\n            <div class="label">' +
+	((__t = ( s.display )) == null ? '' : __t) +
+	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui small black progress" data-percent="' +
+	((__t = ( s.percent )) == null ? '' : __t) +
+	'">\n              <div class="bar"></div>\n            </div>\n          </div>\n        </div>\n      ';
+	 }) ;
+	__p += '\n    </div>\n\n  ';
+	 } ;
+	__p += '\n</div>\n';
+	return __p
+	}
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Backbone, Deck,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	Backbone = __webpack_require__(20);
+
+	Deck = (function(superClass) {
+	  extend(Deck, superClass);
+
+	  function Deck() {
+	    return Deck.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Deck.prototype.defaults = {
+	    name: 'Default Deck',
+	    description: 'A default deck.',
+	    number_of_cards: 0
+	  };
+
+	  return Deck;
+
+	})(Backbone.Model);
+
+	module.exports = Deck;
+
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var $, Backbone, Deck, DeckEntryView, DeckView, Decks, DecksView, _, deck_entry_template, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
@@ -37245,15 +37457,15 @@
 
 	Backbone = __webpack_require__(20);
 
-	__webpack_require__(52);
+	__webpack_require__(57);
 
-	template = __webpack_require__(54);
+	template = __webpack_require__(59);
 
-	deck_entry_template = __webpack_require__(55);
+	deck_entry_template = __webpack_require__(60);
 
-	Deck = __webpack_require__(56);
+	Deck = __webpack_require__(55);
 
-	DeckView = __webpack_require__(57);
+	DeckView = __webpack_require__(51);
 
 	Decks = (function(superClass) {
 	  extend(Decks, superClass);
@@ -37294,6 +37506,7 @@
 
 	  DecksView.prototype.events = {
 	    'click .deck-entry': 'preview',
+	    'click .deck-entry .food': 'deckDetail',
 	    'click .add-a-deck .submit': 'addADeck',
 	    'click .toggle-add-a-deck': 'toggleAddADeck'
 	  };
@@ -37382,6 +37595,17 @@
 	    return deckView.fetchReviewStats();
 	  };
 
+	  DecksView.prototype.deckDetail = function(e) {
+	    var $entry, deck, name;
+	    e.preventDefault();
+	    $entry = $(e.currentTarget).parent().parent();
+	    name = $entry.attr('id');
+	    deck = this.collection.findWhere({
+	      name: name
+	    });
+	    return window.location = "/#decks/detail/" + (deck.get('name'));
+	  };
+
 	  return DecksView;
 
 	})(Backbone.View);
@@ -37390,13 +37614,13 @@
 
 
 /***/ },
-/* 52 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(53);
+	var content = __webpack_require__(58);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37416,7 +37640,7 @@
 	}
 
 /***/ },
-/* 53 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37430,17 +37654,17 @@
 
 
 /***/ },
-/* 54 */
+/* 59 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui stackable padded grid">\n  <div class="six wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column deck-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui stackable padded grid">\n  <div class="six wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="computer only ten wide column deck-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
 /***/ },
-/* 55 */
+/* 60 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37452,199 +37676,6 @@
 	') ' +
 	((__t = ( data.description )) == null ? '' : __t) +
 	'</div>\n</div>\n';
-	return __p
-	}
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Backbone, Deck,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-
-	Backbone = __webpack_require__(20);
-
-	Deck = (function(superClass) {
-	  extend(Deck, superClass);
-
-	  function Deck() {
-	    return Deck.__super__.constructor.apply(this, arguments);
-	  }
-
-	  Deck.prototype.defaults = {
-	    name: 'Default Deck',
-	    description: 'A default deck.',
-	    number_of_cards: 0
-	  };
-
-	  return Deck;
-
-	})(Backbone.Model);
-
-	module.exports = Deck;
-
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $, Backbone, DeckView, _, template,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
-
-	$ = __webpack_require__(1);
-
-	_ = __webpack_require__(35);
-
-	Backbone = __webpack_require__(20);
-
-	__webpack_require__(58);
-
-	template = __webpack_require__(60);
-
-	DeckView = (function(superClass) {
-	  extend(DeckView, superClass);
-
-	  DeckView.prototype.className = 'deck-detail';
-
-	  DeckView.prototype.events = {
-	    'click .setup-review': 'setupReview',
-	    'click .start-review': 'startReview'
-	  };
-
-	  function DeckView(opts) {
-	    DeckView.__super__.constructor.call(this, opts);
-	    this.reviewStats = {
-	      setup: false,
-	      stats: {}
-	    };
-	  }
-
-	  DeckView.prototype.render = function() {
-	    this.$el.html(template(_.extend(this.model.toJSON(), {
-	      reviewStats: this.reviewStats
-	    })));
-	    this.$('.stats .progress').each((function(_this) {
-	      return function(index, el) {
-	        return window.$(el).progress();
-	      };
-	    })(this));
-	    return this;
-	  };
-
-	  DeckView.prototype.fetchReviewStats = function() {
-	    return $.ajax({
-	      url: "/review/" + (this.model.get('name')) + "/statistics",
-	      success: (function(_this) {
-	        return function(res) {
-	          if (res.message !== 'ok') {
-	            return alert(res.err);
-	          }
-	          _this.reviewStats = res.data;
-	          return _this.render();
-	        };
-	      })(this)
-	    });
-	  };
-
-	  DeckView.prototype.setupReview = function() {
-	    return $.ajax({
-	      url: "/review/" + (this.model.get('name')) + "/setup",
-	      success: (function(_this) {
-	        return function(res) {
-	          if (res.message !== 'ok') {
-	            return alert(res.err);
-	          }
-	          return _this.fetchReviewStats();
-	        };
-	      })(this)
-	    });
-	  };
-
-	  DeckView.prototype.startReview = function() {
-	    return window.location = "/#decks/" + (this.model.get('name')) + "/review";
-	  };
-
-	  return DeckView;
-
-	})(Backbone.View);
-
-	module.exports = DeckView;
-
-
-/***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(59);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(16)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../../node_modules/css-loader/index.js!./deck.css", function() {
-				var newContent = require("!!../../../node_modules/css-loader/index.js!./deck.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 59 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(5)(undefined);
-	// imports
-
-
-	// module
-	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n\n.deck-detail .stats {\n  margin-top: 20px;\n}\n\n.deck-detail .stats .column {\n  padding-top: 0 !important;\n}\n.deck-detail .stats .progress {\n  margin: 0;\n}\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 60 */
-/***/ function(module, exports) {
-
-	module.exports = function (data) {
-	var __t, __p = '', __j = Array.prototype.join;
-	function print() { __p += __j.call(arguments, '') }
-	__p += '<div class="basic-info">\n  <h1>' +
-	((__t = ( data.name )) == null ? '' : __t) +
-	'</h1>\n  <p>' +
-	((__t = ( data.description )) == null ? '' : __t) +
-	'</p>\n  <div class="ui one statistics">\n    <div class="blue statistic">\n      <div class="value">' +
-	((__t = ( data.number_of_cards )) == null ? '' : __t) +
-	'</div>\n      <div class="label">Cards</div>\n    </div>\n  </div>\n  <div class="ui buttons">\n    <a class="ui button" href="/#decks/' +
-	((__t = ( data.name )) == null ? '' : __t) +
-	'/review">\n      <i class="left unhide icon"></i>\n      View\n    </a>\n    <div class="or"></div>\n    <a class="ui button" href="/#decks/' +
-	((__t = ( data.name )) == null ? '' : __t) +
-	'/cards">\n      Edit\n      <i class="right edit icon"></i>\n    </a>\n  </div>\n\n  <hr>\n\n  ';
-	 if (!data.reviewStats.setup) { ;
-	__p += '\n    <div class="ui button black large setup-review">Setup Review Schedule</div>\n  ';
-	 } else { ;
-	__p += '\n    <div class="ui button black large start-review">Start Review</div>\n\n    <div class="stats">\n      ';
-	 data.reviewStats.stats.forEach(function (s) { ;
-	__p += '\n        <div class="ui right aligned padded grid">\n          <div class="three wide column">\n            <div class="label">' +
-	((__t = ( s.display )) == null ? '' : __t) +
-	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui small black progress" data-percent="' +
-	((__t = ( s.percent )) == null ? '' : __t) +
-	'">\n              <div class="bar"></div>\n            </div>\n          </div>\n        </div>\n      ';
-	 }) ;
-	__p += '\n    </div>\n\n  ';
-	 } ;
-	__p += '\n</div>\n';
 	return __p
 	}
 

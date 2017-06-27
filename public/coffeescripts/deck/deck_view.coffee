@@ -4,6 +4,7 @@ Backbone = require 'backbone'
 require './deck.css'
 
 template = require './deck.ejs'
+Deck = require './deck.coffee'
 
 class DeckView extends Backbone.View
     className: 'deck-detail'
@@ -14,7 +15,11 @@ class DeckView extends Backbone.View
 
     constructor: (opts) ->
         super opts
+
         @reviewStats = setup: false, stats: {}
+        if opts.deck
+            @model = new Deck(name: opts.deck)
+            @fetchReviewStats()
 
     render: ->
         @$el.html template(_.extend @model.toJSON(), reviewStats: @reviewStats)
@@ -26,6 +31,7 @@ class DeckView extends Backbone.View
             url: "/review/#{@model.get 'name'}/statistics"
             success: (res) =>
                 return alert res.err unless res.message is 'ok'
+                @model.set res.data.deck
                 @reviewStats = res.data
                 @render()
 

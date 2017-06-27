@@ -27,6 +27,7 @@ class DecksView extends Backbone.View
 
     events:
         'click .deck-entry': 'preview'
+        'click .deck-entry .food': 'deckDetail'
         'click .add-a-deck .submit': 'addADeck'
         'click .toggle-add-a-deck': 'toggleAddADeck'
 
@@ -89,6 +90,14 @@ class DecksView extends Backbone.View
         @deckPreivew = deckView = new DeckView(model: deck)
         @$('.deck-preview').html deckView.render().el
         deckView.fetchReviewStats()
+
+    deckDetail: (e) ->
+        e.preventDefault()
+
+        $entry = $(e.currentTarget).parent().parent()
+        name = $entry.attr 'id'
+        deck = @collection.findWhere name: name
+        window.location = "/#decks/detail/#{deck.get 'name'}"
 
 
 module.exports = DecksView
