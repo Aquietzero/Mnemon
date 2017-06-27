@@ -1,0 +1,43 @@
+<div class="section">
+  <h1 class="title"><%= data.title %></h1>
+  <h2 class="sub-title"><%= data.sub_title %></h2>
+</div>
+
+<hr />
+
+<div class="section">
+  <p class="explain"><%= data.explain %></p>
+</div>
+
+<div class="section">
+  <% data.content.split(/\n+/g).forEach(function (line) { %>
+    <p><%= line.trim() %></p>
+  <% }) %>
+</div>
+
+<% if (data.memory_aids) { %>
+  <div class="section">
+    <div class="memory-aids-section">
+      <div class="header">memory aids</div>
+      <p class="memory-aids"><%= data.memory_aids %></p>
+    </div>
+  </div>
+<% } %>
+
+<% if (data.connections && data.connections.length > 0) { %>
+  <hr />
+  <div class="section connections">
+  </div>
+<% } %>
+
+<div class="ui bottom visible inverted sidebar labeled icon two item menu">
+  <div class="item remember">
+    <i class="checkmark icon"></i>
+    Remembered
+  </div>
+  <div class="item not-remember">
+    <i class="remove icon"></i>
+    Forgot
+  </div>
+</div>
+

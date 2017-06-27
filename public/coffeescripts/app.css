@@ -1,9 +1,9 @@
 body.zen-mode {
-  overflow: hidden;
+  overflow: auto;
   height: 100%;
 }
 
-body.zen-mode .sidebar {
+body.zen-mode .app-sidebar.sidebar {
   display: none !important;
 }
 

@@ -4,8 +4,11 @@ Backbone = require 'backbone'
 Mousetrap = require 'mousetrap'
 require './review.css'
 
+MobileDetect = require '../device.coffee'
+
 Card = require '../card/card.coffee'
 ReviewCardView = require '../review_card/review_card_view.coffee'
+ZenCardView = require '../zen_card/zen_card_view.coffee'
 
 template = require './review.ejs'
 
@@ -59,7 +62,8 @@ class ReviewView extends Backbone.View
             delete @currentCard
 
         card = new Card(card)
-        @currentCard = cardView = new ReviewCardView(model: card)
+        CardView = if MobileDetect.mobile() then ZenCardView else ReviewCardView
+        @currentCard = cardView = new CardView(model: card)
         @$('.current-card').html cardView.render().el
 
     nextCard: ->

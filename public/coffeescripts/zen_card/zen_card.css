@@ -1,0 +1,49 @@
+
+.zen-card {
+  position: relative;
+  width: 100%;
+}
+
+.zen-card .section {
+  padding: 20px;
+}
+
+.zen-card .header {
+  font-size: 0.5em;
+  text-align: center;
+}
+
+.zen-card input,
+.zen-card textarea {
+  border: none;
+  width: 100%;
+}
+
+.zen-card textarea.content {
+  min-height: 290px;
+}
+.zen-card textarea.explain {
+  min-height: 30px;
+}
+
+.zen-card .title {
+  text-align: center;
+  font-size: 1.7em;
+  font-weight: bold;
+}
+
+.zen-card .sub-title {
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.zen-card .explain {
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.zen-card .content {
+  font-size: 1em;
+  text-align: left;
+}
+
