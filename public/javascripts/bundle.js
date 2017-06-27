@@ -54,21 +54,23 @@
 
 	__webpack_require__(3);
 
-	Backbone = __webpack_require__(18);
+	__webpack_require__(18);
 
-	Router = __webpack_require__(20);
+	Backbone = __webpack_require__(20);
 
-	Dashboard = __webpack_require__(21);
+	Router = __webpack_require__(22);
 
-	CardView = __webpack_require__(26);
+	Dashboard = __webpack_require__(23);
 
-	CardsView = __webpack_require__(43);
+	CardView = __webpack_require__(28);
 
-	DecksView = __webpack_require__(49);
+	CardsView = __webpack_require__(45);
 
-	ReviewView = __webpack_require__(59);
+	DecksView = __webpack_require__(51);
 
-	HelpView = __webpack_require__(67);
+	ReviewView = __webpack_require__(61);
+
+	HelpView = __webpack_require__(69);
 
 	App = (function(superClass) {
 	  extend(App, superClass);
@@ -89,6 +91,7 @@
 	      delete this.currentPage;
 	    }
 	    console.log("app: render " + page + ", " + params);
+	    $('body').removeClass('zen-mode');
 	    switch (page) {
 	      case 'card':
 	        this.currentPage = new CardView({
@@ -108,6 +111,7 @@
 	        this.$('.content').html(this.currentPage.render().el);
 	        break;
 	      case 'review':
+	        $('body').addClass('zen-mode');
 	        this.currentPage = new ReviewView({
 	          deck: params[0]
 	        });
@@ -12993,6 +12997,46 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(19);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(16)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./app.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./app.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(5)(undefined);
+	// imports
+
+
+	// module
+	exports.push([module.id, "body.zen-mode {\n  overflow: hidden;\n  height: 100%;\n}\n\nbody.zen-mode .sidebar {\n  display: none !important;\n}\n\nbody.zen-mode .container {\n  padding: 0 !important;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {//     Backbone.js 1.3.3
 
 	//     (c) 2010-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -13009,7 +13053,7 @@
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(19), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(21), __webpack_require__(1), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -14917,7 +14961,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -16471,14 +16515,14 @@
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Router,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
 	Router = (function(superClass) {
 	  extend(Router, superClass);
@@ -16536,20 +16580,20 @@
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Dashboard, _, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	__webpack_require__(23);
+	__webpack_require__(25);
 
-	template = __webpack_require__(25);
+	template = __webpack_require__(27);
 
 	Dashboard = (function(superClass) {
 	  extend(Dashboard, superClass);
@@ -16576,7 +16620,7 @@
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -18130,13 +18174,13 @@
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(24);
+	var content = __webpack_require__(26);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -18156,7 +18200,7 @@
 	}
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -18170,7 +18214,7 @@
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -18182,7 +18226,7 @@
 	}
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Card, CardView, Mousetrap, TagsEditorView, _, ajax, event, explainTemplate, socket, template,
@@ -18191,27 +18235,27 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	Mousetrap = __webpack_require__(27);
+	Mousetrap = __webpack_require__(29);
 
-	__webpack_require__(28);
+	__webpack_require__(30);
 
-	event = __webpack_require__(30);
+	event = __webpack_require__(32);
 
-	socket = __webpack_require__(31);
+	socket = __webpack_require__(33);
 
-	ajax = __webpack_require__(32);
+	ajax = __webpack_require__(34);
 
-	template = __webpack_require__(35);
+	template = __webpack_require__(37);
 
-	explainTemplate = __webpack_require__(36);
+	explainTemplate = __webpack_require__(38);
 
-	Card = __webpack_require__(37);
+	Card = __webpack_require__(39);
 
-	TagsEditorView = __webpack_require__(38);
+	TagsEditorView = __webpack_require__(40);
 
 	CardView = (function(superClass) {
 	  extend(CardView, superClass);
@@ -18365,7 +18409,7 @@
 
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*global define:false */
@@ -19415,13 +19459,13 @@
 
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(29);
+	var content = __webpack_require__(31);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -19441,7 +19485,7 @@
 	}
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -19449,20 +19493,20 @@
 
 
 	// module
-	exports.push([module.id, ".card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
+	exports.push([module.id, "\n@media (min-width: 501px) {\n.card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  max-height: 85%;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n  color: black !important;\n}\n}\n\n@media (max-width: 500px) {\n  .card {\n    border: none;\n  }\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Event,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
 	Event = (function(superClass) {
 	  extend(Event, superClass);
@@ -19479,7 +19523,7 @@
 
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports) {
 
 	var socket;
@@ -19490,12 +19534,12 @@
 
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, _, ajax;
 
-	_ = __webpack_require__(33);
+	_ = __webpack_require__(35);
 
 	$ = __webpack_require__(1);
 
@@ -19511,7 +19555,7 @@
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
@@ -36599,10 +36643,10 @@
 	  }
 	}.call(this));
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(34)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(36)(module)))
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -36618,7 +36662,7 @@
 
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -36638,7 +36682,7 @@
 	}
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -36663,14 +36707,14 @@
 	}
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Card,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
 	Card = (function(superClass) {
 	  extend(Card, superClass);
@@ -36701,7 +36745,7 @@
 
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Tag, Tags, TagsEditorView, _, tagsTemplate, template,
@@ -36710,15 +36754,15 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	__webpack_require__(39);
+	__webpack_require__(41);
 
-	template = __webpack_require__(41);
+	template = __webpack_require__(43);
 
-	tagsTemplate = __webpack_require__(42);
+	tagsTemplate = __webpack_require__(44);
 
 	Tag = (function(superClass) {
 	  extend(Tag, superClass);
@@ -36837,13 +36881,13 @@
 
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(40);
+	var content = __webpack_require__(42);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -36863,7 +36907,7 @@
 	}
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -36877,7 +36921,7 @@
 
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -36887,7 +36931,7 @@
 	}
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -36906,7 +36950,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Card, CardEntryView, CardView, Cards, CardsView, Mousetrap, _, ajax, card_entry_template, event, template,
@@ -36916,27 +36960,27 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(33);
+	_ = __webpack_require__(35);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	Mousetrap = __webpack_require__(27);
+	Mousetrap = __webpack_require__(29);
 
-	__webpack_require__(44);
+	__webpack_require__(46);
 
-	event = __webpack_require__(30);
+	event = __webpack_require__(32);
 
-	ajax = __webpack_require__(32);
+	ajax = __webpack_require__(34);
 
-	template = __webpack_require__(46);
+	template = __webpack_require__(48);
 
-	card_entry_template = __webpack_require__(47);
+	card_entry_template = __webpack_require__(49);
 
-	Cards = __webpack_require__(48);
+	Cards = __webpack_require__(50);
 
-	Card = __webpack_require__(37);
+	Card = __webpack_require__(39);
 
-	CardView = __webpack_require__(26);
+	CardView = __webpack_require__(28);
 
 	CardEntryView = (function(superClass) {
 	  extend(CardEntryView, superClass);
@@ -37094,13 +37138,13 @@
 
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(45);
+	var content = __webpack_require__(47);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37120,7 +37164,7 @@
 	}
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37128,23 +37172,23 @@
 
 
 	// module
-	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
+	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
 
 	// exports
 
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="six wide column cards-list">\n    <div class="search-and-add">\n      <div class="ui category search">\n        <div class="ui icon input">\n          <input class="prompt" type="text" placeholder="Search for words...">\n          <i class="search icon"></i>\n        </div>\n      </div>\n\n      <hr class="search-delimiter">\n\n      <button class="ui secondary button add-a-card">Add a card</button>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column card-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui stackable padded grid">\n  <div class="six wide column cards-list">\n    <div class="search-and-add">\n      <div class="ui category search">\n        <div class="ui icon input">\n          <input class="prompt" type="text" placeholder="Search for words...">\n          <i class="search icon"></i>\n        </div>\n      </div>\n\n      <hr class="search-delimiter">\n\n      <button class="ui secondary button add-a-card">Add a card</button>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="computer only ten wide column card-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37160,16 +37204,16 @@
 	}
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Card, Cards,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	Card = __webpack_require__(37);
+	Card = __webpack_require__(39);
 
 	Cards = (function(superClass) {
 	  extend(Cards, superClass);
@@ -37188,7 +37232,7 @@
 
 
 /***/ },
-/* 49 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Deck, DeckEntryView, DeckView, Decks, DecksView, _, deck_entry_template, template,
@@ -37197,19 +37241,19 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	__webpack_require__(50);
+	__webpack_require__(52);
 
-	template = __webpack_require__(52);
+	template = __webpack_require__(54);
 
-	deck_entry_template = __webpack_require__(53);
+	deck_entry_template = __webpack_require__(55);
 
-	Deck = __webpack_require__(54);
+	Deck = __webpack_require__(56);
 
-	DeckView = __webpack_require__(55);
+	DeckView = __webpack_require__(57);
 
 	Decks = (function(superClass) {
 	  extend(Decks, superClass);
@@ -37346,13 +37390,13 @@
 
 
 /***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(51);
+	var content = __webpack_require__(53);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37372,7 +37416,7 @@
 	}
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37386,17 +37430,17 @@
 
 
 /***/ },
-/* 52 */
+/* 54 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
 	var __t, __p = '';
-	__p += '<div class="ui padded grid">\n  <div class="six wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column deck-preview">\n  </div>\n</div>\n';
+	__p += '<div class="ui stackable padded grid">\n  <div class="six wide column decks-list">\n    <div class="ui category search">\n      <div class="ui icon input">\n        <input class="prompt" type="text" placeholder="Search for deck...">\n        <i class="search icon"></i>\n      </div>\n    </div>\n\n    <hr class="search-delimiter">\n\n    <div class="add-a-deck">\n      <button class="ui secondary button toggle-add-a-deck">Add a deck</button>\n\n      <div class="ui form hide">\n        <div class="field">\n          <input name="name" type="text" placeholder="Name of the deck.">\n        </div>\n        <div class="field">\n          <input name="description" type="text" placeholder="Brief desription of the deck.">\n        </div>\n        <button class="ui button submit" type="submit">Submit</button>\n      </div>\n    </div>\n\n    <div class="ui relaxed divided list search-result">\n    </div>\n  </div>\n\n  <div class="ten wide column deck-preview">\n  </div>\n</div>\n';
 	return __p
 	}
 
 /***/ },
-/* 53 */
+/* 55 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37412,14 +37456,14 @@
 	}
 
 /***/ },
-/* 54 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Backbone, Deck,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
 	Deck = (function(superClass) {
 	  extend(Deck, superClass);
@@ -37442,7 +37486,7 @@
 
 
 /***/ },
-/* 55 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, DeckView, _, template,
@@ -37451,13 +37495,13 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(33);
+	_ = __webpack_require__(35);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	__webpack_require__(56);
+	__webpack_require__(58);
 
-	template = __webpack_require__(58);
+	template = __webpack_require__(60);
 
 	DeckView = (function(superClass) {
 	  extend(DeckView, superClass);
@@ -37530,13 +37574,13 @@
 
 
 /***/ },
-/* 56 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(57);
+	var content = __webpack_require__(59);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37556,7 +37600,7 @@
 	}
 
 /***/ },
-/* 57 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37570,7 +37614,7 @@
 
 
 /***/ },
-/* 58 */
+/* 60 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37605,7 +37649,7 @@
 	}
 
 /***/ },
-/* 59 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Card, Mousetrap, ReviewCardView, ReviewView, _, template,
@@ -37614,19 +37658,19 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	Mousetrap = __webpack_require__(27);
+	Mousetrap = __webpack_require__(29);
 
-	__webpack_require__(60);
+	__webpack_require__(62);
 
-	Card = __webpack_require__(37);
+	Card = __webpack_require__(39);
 
-	ReviewCardView = __webpack_require__(62);
+	ReviewCardView = __webpack_require__(64);
 
-	template = __webpack_require__(66);
+	template = __webpack_require__(68);
 
 	ReviewView = (function(superClass) {
 	  extend(ReviewView, superClass);
@@ -37753,13 +37797,13 @@
 
 
 /***/ },
-/* 60 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(61);
+	var content = __webpack_require__(63);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37779,7 +37823,7 @@
 	}
 
 /***/ },
-/* 61 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37793,7 +37837,7 @@
 
 
 /***/ },
-/* 62 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, Card, Mousetrap, ReviewCardView, _, template,
@@ -37802,17 +37846,17 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	Mousetrap = __webpack_require__(27);
+	Mousetrap = __webpack_require__(29);
 
-	__webpack_require__(63);
+	__webpack_require__(65);
 
-	template = __webpack_require__(65);
+	template = __webpack_require__(67);
 
-	Card = __webpack_require__(37);
+	Card = __webpack_require__(39);
 
 	ReviewCardView = (function(superClass) {
 	  extend(ReviewCardView, superClass);
@@ -37843,13 +37887,13 @@
 
 
 /***/ },
-/* 63 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(64);
+	var content = __webpack_require__(66);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37869,7 +37913,7 @@
 	}
 
 /***/ },
-/* 64 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -37883,7 +37927,7 @@
 
 
 /***/ },
-/* 65 */
+/* 67 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37910,7 +37954,7 @@
 	}
 
 /***/ },
-/* 66 */
+/* 68 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {
@@ -37920,7 +37964,7 @@
 	}
 
 /***/ },
-/* 67 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Backbone, HelpView, _, template,
@@ -37929,13 +37973,13 @@
 
 	$ = __webpack_require__(1);
 
-	_ = __webpack_require__(22);
+	_ = __webpack_require__(24);
 
-	Backbone = __webpack_require__(18);
+	Backbone = __webpack_require__(20);
 
-	__webpack_require__(68);
+	__webpack_require__(70);
 
-	template = __webpack_require__(70);
+	template = __webpack_require__(72);
 
 	HelpView = (function(superClass) {
 	  extend(HelpView, superClass);
@@ -37960,13 +38004,13 @@
 
 
 /***/ },
-/* 68 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(69);
+	var content = __webpack_require__(71);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(16)(content, {});
@@ -37986,7 +38030,7 @@
 	}
 
 /***/ },
-/* 69 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(5)(undefined);
@@ -38000,7 +38044,7 @@
 
 
 /***/ },
-/* 70 */
+/* 72 */
 /***/ function(module, exports) {
 
 	module.exports = function (data) {

@@ -1,0 +1,12 @@
+body.zen-mode {
+  overflow: hidden;
+  height: 100%;
+}
+
+body.zen-mode .sidebar {
+  display: none !important;
+}
+
+body.zen-mode .container {
+  padding: 0 !important;
+}

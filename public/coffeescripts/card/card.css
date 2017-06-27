@@ -1,11 +1,14 @@
+
 .card {
   position: relative;
   width: 340px;
   min-height: 500px;
+  max-height: 85%;
   box-shadow: 0 0 5px #ddd;
   border: solid 1px #999;
   border-radius: 10px;
   margin: 30px;
+  color: black !important;
 }
 
 .card .section {

@@ -3,6 +3,8 @@ $ = require 'jquery'
 require 'semantic-ui/dist/semantic.min'
 require 'semantic-ui/dist/semantic.min.css'
 
+require './app.css'
+
 Backbone = require 'backbone'
 
 Router = require './router.coffee'
@@ -29,6 +31,8 @@ class App extends Backbone.View
             delete @currentPage
 
         console.log "app: render #{page}, #{params}"
+
+        $('body').removeClass 'zen-mode'
         switch page
             when 'card'
                 @currentPage = new CardView(title: params[0])
@@ -40,6 +44,7 @@ class App extends Backbone.View
                 @currentPage = new DecksView()
                 @$('.content').html @currentPage.render().el
             when 'review'
+                $('body').addClass 'zen-mode'
                 @currentPage = new ReviewView(deck: params[0])
                 @$('.content').html @currentPage.render().el
             when 'help'

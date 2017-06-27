@@ -13,7 +13,7 @@ module.exports = function (app) {
             Model.card
             .find(query.q)
             .skip(query.page * query.limit)
-            .limit(query.limit)
+            //.limit(query.limit)
             .sort({created_at: -1})
             .exec(function (err, cards) {
                 if (err) return res.send({message: 'failed', error: err});
