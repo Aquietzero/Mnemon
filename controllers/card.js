@@ -77,7 +77,10 @@ module.exports = function (app) {
                             deck.number_of_cards += 1;
                             deck.save(next);
                         });
-                    }
+                    },
+                    function (next) {
+                        Model.mnemon.reviewNewCard(newCard, next);
+                    },
                 ], function (err) {
                     if (err) return res.send({message: 'failed', error: err});
 

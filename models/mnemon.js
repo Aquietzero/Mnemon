@@ -120,5 +120,27 @@ MnemonSchema.statics.put = (user, deck, card, remembered, callback) => {
     });
 }
 
+// Once a new card is being created, then check to see whether the deck it belongs is
+// reviewed by someone or not. If it is, then add a mnemon or that schedule.
+MnemonSchema.statics.reviewNewCard = (card, callback) => {
+    // Multiple users may be reviewing the deck.
+    Model.mnemon.find({deck: card.deck}, (err, mnemons) => {
+        // No one is reviewing the deck.
+        if (!mnemons || mnemons.length == 0) return callback();
+
+        // Create mnemons of the new card for each user.
+        let users = _.uniq(_.map(mnemons, (m) => { return m.user }));
+        async.each(users, (u, next) => {
+            (new Model.mnemon({
+                card: card.title,
+                user: u,
+                deck: card.deck,
+                box: periods[0].name,
+                created_at: Date.now(),
+            })).save(next);
+        }, callback);
+    });
+}
+
 
 module.exports = mnemonDb.model('Mnemon', MnemonSchema, 'mnemons');

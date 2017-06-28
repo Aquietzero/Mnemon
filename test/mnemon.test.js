@@ -137,27 +137,88 @@ describe('Test for mnemon card memorization flow.', () => {
 
         it('should be able to put a card into a proper box.', (done) => {
             async.series([
-                function (next) {
+                (next) => {
                     Model.mnemon.put('zero', 'deck1', 'card1', true, (err, mnemon) => {
                         mnemon.box.should.equal('10MIN');
                         next();
                     });
                 },
-                function (next) {
+                (next) => {
                     Model.mnemon.put('zero', 'deck1', 'card1', false, (err, mnemon) => {
                         mnemon.box.should.equal('1MIN');
                         next();
                     });
                 },
-                function (next) {
+                (next) => {
                     Model.mnemon.put('zero', 'deck1', 'card1', true, next);
                 },
-                function (next) {
+                (next) => {
                     Model.mnemon.put('zero', 'deck1', 'card1', true, next);
                 },
-                function (next) {
+                (next) => {
                     Model.mnemon.put('zero', 'deck1', 'card1', true, (err, mnemon) => {
                         mnemon.box.should.equal('4D');
+                        next();
+                    });
+                },
+            ], done);
+        });
+    });
+
+    describe('Mnemon#reviewNewCard', () => {
+        it('should not create any mnemons for non-reviewing decks.', (done) => {
+            async.series([
+                (next) => {
+                    Model.mnemon.count((err, c) => {
+                        c.should.equal(0);
+                        next();
+                    });
+                },
+                (next) => {
+                    (new Model.card({
+                        user: 'zero',
+                        title: 'card4',
+                        explain: 'card4',
+                        content: 'card4',
+                        deck: 'deck1',
+                    })).save((err, newCard) => {
+                        Model.mnemon.reviewNewCard(newCard, next);
+                    });
+                },
+                (next) => {
+                    Model.mnemon.count((err, c) => {
+                        c.should.equal(0);
+                        next();
+                    });
+                },
+            ], done);
+        });
+
+        it('should create new mnemons for new card for each user.', (done) => {
+            async.series([
+                (next) => {
+                    Model.mnemon.reviewDeck('zero', 'deck1', next);
+                },
+                (next) => {
+                    Model.mnemon.reviewDeck('yj', 'deck1', next);
+                },
+                (next) => {
+                    (new Model.card({
+                        user: 'zero',
+                        title: 'card4',
+                        explain: 'card4',
+                        content: 'card4',
+                        deck: 'deck1',
+                    })).save((err, newCard) => {
+                        Model.mnemon.reviewNewCard(newCard, next);
+                    });
+                },
+                (next) => {
+                    Model.mnemon.find({deck: 'deck1', card: 'card4'}, (err, mnemons) => {
+                        mnemons.length.should.equal(2);
+                        let users = _.map(mnemons, 'user');
+                        users.should.containEql('zero');
+                        users.should.containEql('yj');
                         next();
                     });
                 },
