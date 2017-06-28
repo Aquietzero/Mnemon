@@ -37022,8 +37022,7 @@
 
 	  CardsView.prototype.events = {
 	    'click .card-entry': 'preview',
-	    'click .add-a-card': 'addACard',
-	    'scroll .search-result': 'scrolling'
+	    'click .add-a-card': 'addACard'
 	  };
 
 	  function CardsView(options) {
@@ -37042,6 +37041,7 @@
 	      page: 0,
 	      limit: 20
 	    };
+	    this.reachEnd = false;
 	    this.collection = new Cards();
 	    this.listenTo(this.collection, 'add', this.renderCard);
 	    event.on('card:create', (function(_this) {
@@ -37064,6 +37064,7 @@
 	    this.$el.html(template());
 	    this.$('.cards-list').height($(window).height());
 	    window.addEventListener('resize', this.adjustSearchBar);
+	    this.$('.cards-list').scroll(this.scrolling.bind(this));
 	    if (this.card) {
 	      this.cardPreview = cardView = new CardView({
 	        title: this.card
@@ -37082,6 +37083,9 @@
 	      },
 	      success: (function(_this) {
 	        return function(res) {
+	          if (res.data.length === 0) {
+	            _this.reachEnd = true;
+	          }
 	          _this.collection.add(res.data);
 	          _this.adjustSearchBar();
 	          if (!_this.cardPreview) {
@@ -37138,6 +37142,22 @@
 	    });
 	    this.$('.card-preview').html(cardView.render().el);
 	    return cardView.$('input.title').focus();
+	  };
+
+	  CardsView.prototype.scrolling = function(e) {
+	    var fixHeight, listHeight, paddingTop, scrollTop;
+	    if (this.reachEnd) {
+	      return;
+	    }
+	    fixHeight = this.$('.cards-list').height();
+	    scrollTop = this.$('.cards-list').scrollTop();
+	    listHeight = this.$('.search-result').height();
+	    paddingTop = 120;
+	    if (Math.abs(fixHeight + scrollTop - listHeight - paddingTop) < 30) {
+	      console.log('near bottom');
+	      this.query.page += 1;
+	      return this.fetch();
+	    }
 	  };
 
 	  return CardsView;

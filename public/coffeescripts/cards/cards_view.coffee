@@ -31,7 +31,7 @@ class CardsView extends Backbone.View
     events:
         'click .card-entry': 'preview'
         'click .add-a-card': 'addACard'
-        'scroll .search-result': 'scrolling'
+        #'scroll .cards-list': 'scrolling'
 
     constructor: (options) ->
         super
@@ -46,6 +46,7 @@ class CardsView extends Backbone.View
             q: q
             page: 0
             limit: 20
+        @reachEnd = false
         @collection = new Cards()
         @listenTo @collection, 'add', @renderCard
 
@@ -68,6 +69,7 @@ class CardsView extends Backbone.View
 
         # window events.
         window.addEventListener 'resize', @adjustSearchBar
+        @$('.cards-list').scroll @scrolling.bind(@)
 
         if @card
             @cardPreview = cardView = new CardView(title: @card)
@@ -81,6 +83,7 @@ class CardsView extends Backbone.View
             data:
                 query: @query
             success: (res) =>
+                @reachEnd = true if res.data.length == 0
                 @collection.add res.data
                 @adjustSearchBar()
                 unless @cardPreview
@@ -120,5 +123,16 @@ class CardsView extends Backbone.View
         @$('.card-preview').html cardView.render().el
         cardView.$('input.title').focus()
 
+    scrolling: (e) ->
+        return if @reachEnd
+
+        fixHeight = @$('.cards-list').height()
+        scrollTop = @$('.cards-list').scrollTop()
+        listHeight = @$('.search-result').height()
+        paddingTop = 120
+
+        if Math.abs(fixHeight + scrollTop - listHeight - paddingTop) < 30
+            @query.page += 1
+            @fetch()
 
 module.exports = CardsView
