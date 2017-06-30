@@ -19503,7 +19503,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  max-height: 85%;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n  color: black !important;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
+	exports.push([module.id, "\n.card {\n  position: relative;\n  width: 340px;\n  min-height: 500px;\n  box-shadow: 0 0 5px #ddd;\n  border: solid 1px #999;\n  border-radius: 10px;\n  margin: 30px;\n  color: black !important;\n}\n\n.card .section {\n  margin: 20px;\n}\n\n.card .header {\n  font-size: 0.5em;\n  color: #666;\n  text-align: center;\n}\n\n.card input,\n.card textarea {\n  border: none;\n  width: 100%;\n}\n.card input:focus,\n.card textarea:focus {\n  outline: none;\n  resize: none;\n}\n.card textarea.content {\n  min-height: 290px;\n}\n.card textarea.explain {\n  min-height: 30px;\n}\n\n.card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n.card .operations {\n  position: absolute;\n  bottom: -85px;\n  text-align: center;\n  width: 100%;\n}\n\n.card .operation {\n  cursor: pointer;\n}\n\n.word-explain {\n  position: absolute;\n  display: none;\n  right: 0;\n  top: 20px;\n  width: 210px;\n  margin-right: 0px;\n  border: solid 1px #999;\n  padding: 20px;\n  max-height: 400px;\n  overflow: scroll;\n  border-radius: 0 5px 5px 0;\n  color: #999;\n  font-size: 0.8em;\n}\n\n.word-explain.show {\n  display: block;\n  margin-right: -210px;\n}\n\n", ""]);
 
 	// exports
 
@@ -36829,9 +36829,9 @@
 	  }
 
 	  TagsEditorView.prototype.getTags = function() {
-	    return _.map(this.collection.models, function(m) {
+	    return _.unique(_.map(this.collection.models, function(m) {
 	      return m.get('name');
-	    });
+	    }));
 	  };
 
 	  TagsEditorView.prototype.setTags = function(tags) {
@@ -36864,9 +36864,13 @@
 	      return;
 	    }
 	    tag = this.$('.add-a-tag').val();
-	    return this.collection.add(new Tag({
+	    if (!this.collection.findWhere({
 	      name: tag
-	    }));
+	    })) {
+	      return this.collection.add(new Tag({
+	        name: tag
+	      }));
+	    }
 	  };
 
 	  TagsEditorView.prototype.deleteTag = function(e) {
@@ -37154,7 +37158,6 @@
 	    listHeight = this.$('.search-result').height();
 	    paddingTop = 120;
 	    if (Math.abs(fixHeight + scrollTop - listHeight - paddingTop) < 30) {
-	      console.log('near bottom');
 	      this.query.page += 1;
 	      return this.fetch();
 	    }
@@ -37309,9 +37312,11 @@
 	    this.$el.html(template(_.extend(this.model.toJSON(), {
 	      reviewStats: this.reviewStats
 	    })));
-	    this.$('.stats .progress').each((function(_this) {
+	    this.$('.stats .ui.progress').each((function(_this) {
 	      return function(index, el) {
-	        return window.$(el).progress();
+	        return window.$(el).progress({
+	          percent: parseInt($(el).attr('data-percent'))
+	        });
 	      };
 	    })(this));
 	    return this;
@@ -37423,9 +37428,9 @@
 	 data.reviewStats.stats.forEach(function (s) { ;
 	__p += '\n        <div class="ui right aligned padded grid">\n          <div class="three wide column">\n            <div class="label">' +
 	((__t = ( s.display )) == null ? '' : __t) +
-	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui small black progress" data-percent="' +
+	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui black small progress" data-percent="' +
 	((__t = ( s.percent )) == null ? '' : __t) +
-	'">\n              <div class="bar"></div>\n            </div>\n          </div>\n        </div>\n      ';
+	'">\n              <div class="bar">\n              </div>\n            </div>\n          </div>\n        </div>\n      ';
 	 }) ;
 	__p += '\n    </div>\n\n  ';
 	 } ;

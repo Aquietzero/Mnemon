@@ -54,5 +54,23 @@ var CardSchema = new Schema({
     },
 });
 
+CardSchema.methods.sentences = function () {
+    var title = this.title;
+    var include = function (s) {
+        return _.includes(s, title) &&
+            !s[0].trim().match(/^\d+/g) // sentence start with number.
+    }
+    var format = function (s) {
+        s = s.replace(/[（）]/g, '');
+        return s.trim();
+    }
+
+    var sentences = _.compact(this.content.split(/[\r\n。？！?!]/g));
+    sentences = _.filter(sentences, include);
+    sentences = _.map(sentences, format);
+
+    return sentences;
+}
+
 
 module.exports = mnemonDb.model('Card', CardSchema, 'cards');

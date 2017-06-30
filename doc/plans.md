@@ -95,3 +95,15 @@ Tag types:
 
 1. **When creating a card**: Connections can be added manually in the form of simple text.
 2. **When loading a card**: Check to see whether each connection has a corresponding card. If yes, then also load the card, or just allow to click a link the connected card.
+
+Connections can be establish automatically with more and more connections are being established. Considering the following process.
+
+Goal: Add c(w1, w2) to w1.
+
+1. Add c(w2, w1) to w2.
+2. For each wi in w2.connections:
+    2.1 Add c(w1, wi) to w1.
+    2.2 Add c(wi, w1) to wi.
+
+So that in the set of [w1, w2, wi...], each contains connections from [(w1, w2, wj(where j != i))], and [w1, w2, wi...] is called a grammar group, which is also closed. Connections only transit once.
+

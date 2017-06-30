@@ -35,7 +35,7 @@ class TagsEditorView extends Backbone.View
         @listenTo @collection, 'reset', @renderTags.bind @
 
     getTags: ->
-        _.map(@collection.models, (m) -> m.get 'name')
+        _.unique _.map(@collection.models, (m) -> m.get 'name')
 
     setTags: (tags) ->
         @collection.reset _.map(tags, (t) -> new Tag(name: t))
@@ -52,7 +52,7 @@ class TagsEditorView extends Backbone.View
         return unless e.keyCode is 13
 
         tag = @$('.add-a-tag').val()
-        @collection.add new Tag(name: tag)
+        @collection.add new Tag(name: tag) unless @collection.findWhere(name: tag)
 
     deleteTag: (e) ->
         $tag = $(e.currentTarget).parent()
