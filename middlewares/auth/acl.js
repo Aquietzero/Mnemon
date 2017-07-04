@@ -12,6 +12,7 @@ var defaultLoginTemplate = fs.readFileSync(path.join(__dirname, 'login.html'), '
 
 var ACL = module.exports = function (app, config) {
     var config = _.extend({
+        title: 'Mnemon',
         sessionSecret: 'valar morghulis',
         secret: 'valar dohaeris',
         expiration: 1000 * 60 * 60 * 24 * 30,
@@ -19,7 +20,8 @@ var ACL = module.exports = function (app, config) {
     }, config || {});
 
     ACL.loginTemplateFile = config.loginTemplateFile;
-    ACL.loginTemplate = _.template(defaultLoginTemplate)({title: 'Mnemon'});
+    //ACL.loginTemplate = _.template(defaultLoginTemplate)({title: 'Mnemon'});
+    ACL.loginTemplate = _.template(defaultLoginTemplate);
 
     this.set('app', app);
     this.set('config', config);
@@ -215,13 +217,14 @@ ACL.prototype.initAccessors = function () {
 
 ACL.prototype.initRouter = function () {
     var app = this.get('app');
+    var config = this.get('config');
     var self = this;
 
     app.get('/login', function (req, res) {
         if (ACL.loginTemplateFile) {
             return res.render(ACL.loginTemplateFile);
         } else {
-            return res.send(ACL.loginTemplate);
+            return res.send(ACL.loginTemplate({title: config.title, msg: {}}));
         }
     });
 
@@ -230,8 +233,14 @@ ACL.prototype.initRouter = function () {
         var passwd = req.body.password;
 
         if (!name && !passwd) {
-            return res.send(ACL.loginTemplate);
-            //return res.send({message: 'Failed', error: 'Lack of arguments.'});
+            return res.send(ACL.loginTemplate({
+                title: config.title,
+                msg: {
+                    group: 'error',
+                    type: 'Login Error',
+                    text: 'Enter name and password.'
+                }
+            }));
         }
 
         async.waterfall([
@@ -240,8 +249,14 @@ ACL.prototype.initRouter = function () {
             },
             function (user, next) {
                 if (!user) {
-                    return res.send(ACL.loginTemplate);
-                    //return next('User name or password not exists.');
+                    return res.send(ACL.loginTemplate({
+                        title: config.title,
+                        msg: {
+                            group: 'error',
+                            type: 'Login Error',
+                            text: 'User does not exist.'
+                        }
+                    }));
                 }
 
                 self.genSessionCookie(user, res);
@@ -250,8 +265,14 @@ ACL.prototype.initRouter = function () {
             }
         ], function (err, data) {
             if (err) {
-                return res.send(ACL.loginTemplate);
-                //return res.send({message: 'Failed', error: err});
+                return res.send(ACL.loginTemplate({
+                    title: config.title,
+                    msg: {
+                        group: 'error',
+                        type: 'Login Error',
+                        text: err
+                    }
+                }));
             }
             res.redirect('/');
         });
