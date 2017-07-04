@@ -11,13 +11,8 @@ var DeckSchema = new Schema({
         index: true,
         unique: true,
     },
-
     description: String,
-
-    user: {
-        type: String,
-        default: 'zero',
-    },
+    user: String,
 
     number_of_cards: {
         type: Number,

@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var async = require('async');
+var moment = require('moment');
 var Model = require('../model');
 
 module.exports = function (app) {
@@ -16,9 +17,16 @@ module.exports = function (app) {
             .exec(function (err, decks) {
                 if (err) return res.send({message: 'failed', error: err});
 
+                var data = _.map(decks, function (deck) {
+                    var d = deck.toJSON();
+                    d.updated_at = moment(deck.updated_at).format('YYYY-MM-DD');
+                    d.created_at = moment(deck.updated_at).format('YYYY-MM-DD');
+                    return d;
+                });
+                console.log(data);
                 return res.send({
                     message: 'ok',
-                    data: decks
+                    data: data
                 });
             });
         },
@@ -34,7 +42,7 @@ module.exports = function (app) {
                 if (deck) {
                     deck = _.extend(deck, req.body);
                 } else {
-                    deck = new Model.deck(req.body);
+                    deck = new Model.deck(_.extend(req.body, {user: req.session.user.name}));
                 }
 
                 deck.save(function (err, newDeck) {

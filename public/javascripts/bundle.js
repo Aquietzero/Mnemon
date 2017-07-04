@@ -37412,7 +37412,11 @@
 	function print() { __p += __j.call(arguments, '') }
 	__p += '<div class="basic-info">\n  <h1>' +
 	((__t = ( data.name )) == null ? '' : __t) +
-	'</h1>\n  <p>' +
+	'</h1>\n  <p>by ' +
+	((__t = ( data.user )) == null ? '' : __t) +
+	'(' +
+	((__t = ( data.created_at )) == null ? '' : __t) +
+	')</p>\n  <p>' +
 	((__t = ( data.description )) == null ? '' : __t) +
 	'</p>\n  <div class="ui one statistics">\n    <div class="blue statistic">\n      <div class="value">' +
 	((__t = ( data.number_of_cards )) == null ? '' : __t) +

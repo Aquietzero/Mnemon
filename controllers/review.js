@@ -1,10 +1,11 @@
 const _ = require('lodash');
 const async = require('async');
+const moment = require('moment');
 const Model = require('../model');
 
 const periods = require('../constants/periods');
 
-module.exports = function (app) {
+module.exports = (app) => {
     return {
         setup: (req, res) => {
             let deck = req.params.deck;
@@ -30,7 +31,9 @@ module.exports = function (app) {
                     Model.deck.findOne({name: deck}, function (err, deck) {
                         if (err || !deck) return next(err || 'deck does not exist.');
 
-                        data.deck = deck;
+                        data.deck = deck.toJSON();
+                        data.deck.updated_at = moment(deck.updated_at).format('YYYY-MM-DD');
+                        data.deck.created_at = moment(deck.updated_at).format('YYYY-MM-DD');
                         next();
                     });
                 },
