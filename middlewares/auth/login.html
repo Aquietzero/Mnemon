@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %> - Login</title>
+    <link rel='stylesheet' type="text/css" href='/stylesheets/semantic.min.css' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <style>
+      h1 {
+        text-align: center;
+        margin-top: 100px !important;
+      }
+      form {
+        width: 300px;
+        margin: auto;
+        padding: 20px;
+        border: solid 1px #999;
+        box-shadow: 0 0 5px #ddd;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="daenerys" class="glass"></div>
+    <div class="content">
+      <h1 class="main-title"><%= title %></h1>
+      <form class="ui form" action="/login" method="post">
+        <div class="field">
+          <input type="text" name="username" placeholder="name" />
+        </div>
+        <div class="field">
+          <input type="password" name="password" placeholder="password" />
+        </div>
+        <button class="ui button" type="submit">Enter</button>
+      </form>
+    </div>
+  </body>
+</html>

@@ -18,6 +18,7 @@
     "ejs": "~2.4.1",
     "ejs-loader": "^0.3.0",
     "express": "~4.13.4",
+    "express-session": "^1.15.3",
     "highcharts": "^v5.0.10",
     "jquery": "^3.1.0",
     "lodash": "^4.13.1",

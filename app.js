@@ -4,8 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var acl = require('./middlewares/auth/acl');
+var session = require('express-session');
 
 var app = express();
+var ACL = exports.ACL = new acl(app);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,6 +27,25 @@ app.use(cookieParser());
 //    sourceMap: true
 //}));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+    secret: ACL.get('config').secret,
+    saveUninitialized: true,
+    resave: true
+}));
+ACL.initRouter();
+
+if (app.get('env') != 'test') {
+    app.use(ACL.authUser());
+    app.use(ACL.accessors.login());
+} else {
+    app.use(function (req, res, next) {
+        req.session.user = {
+            type: 'admin'
+        };
+        next();
+    });
+}
 
 var router = require('./router');
 router(app);

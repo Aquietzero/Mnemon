@@ -1,4 +1,5 @@
 const loadDir = require('./utils').loadDir;
+const ACL = require('./app').ACL;
 
 module.exports = (app) => {
     let Routers = loadDir('controllers', app);
