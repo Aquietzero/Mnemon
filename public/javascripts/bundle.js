@@ -37398,7 +37398,7 @@
 
 
 	// module
-	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n\n.deck-detail .stats {\n  margin-top: 20px;\n}\n\n.deck-detail .stats .column {\n  padding-top: 0 !important;\n}\n.deck-detail .stats .progress {\n  margin: 0;\n}\n", ""]);
+	exports.push([module.id, ".deck-detail .basic-info {\n  text-align: center;\n}\n\n.deck-detail .stats {\n  margin-top: 20px;\n}\n\n", ""]);
 
 	// exports
 
@@ -37426,11 +37426,11 @@
 	 } else { ;
 	__p += '\n    <div class="ui button black large start-review">Start Review</div>\n\n    <div class="stats">\n      ';
 	 data.reviewStats.stats.forEach(function (s) { ;
-	__p += '\n        <div class="ui right aligned padded grid">\n          <div class="three wide column">\n            <div class="label">' +
-	((__t = ( s.display )) == null ? '' : __t) +
-	'</div>\n          </div>\n          <div class="thirteen wide column">\n            <div class="ui black small progress" data-percent="' +
+	__p += '\n        <div class="ui black small progress" data-percent="' +
 	((__t = ( s.percent )) == null ? '' : __t) +
-	'">\n              <div class="bar">\n              </div>\n            </div>\n          </div>\n        </div>\n      ';
+	'">\n          <div class="bar"></div>\n          <div class="label">' +
+	((__t = ( s.display )) == null ? '' : __t) +
+	'</div>\n        </div>\n      ';
 	 }) ;
 	__p += '\n    </div>\n\n  ';
 	 } ;

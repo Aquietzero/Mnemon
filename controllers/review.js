@@ -45,7 +45,7 @@ module.exports = function (app) {
                         // Using array to maintain order.
                         _.each(periods, (p) => {
                             data.stats.push({
-                                display: p.display,
+                                display: p.display + '(' + p.explain + ')',
                                 percent: Math.floor(100*(count[p.name] || 0) / mnemons.length),
                             });
                         });

@@ -28,15 +28,9 @@
 
     <div class="stats">
       <% data.reviewStats.stats.forEach(function (s) { %>
-        <div class="ui right aligned padded grid">
-          <div class="three wide column">
-            <div class="label"><%= s.display %></div>
-          </div>
-          <div class="thirteen wide column">
-            <div class="ui black small progress" data-percent="<%= s.percent %>">
-              <div class="bar"></div>
-            </div>
-          </div>
+        <div class="ui black small progress" data-percent="<%= s.percent %>">
+          <div class="bar"></div>
+          <div class="label"><%= s.display %></div>
         </div>
       <% }) %>
     </div>
