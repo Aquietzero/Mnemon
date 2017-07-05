@@ -110,9 +110,21 @@ MnemonSchema.statics.put = (user, deck, card, remembered, callback) => {
         let prevBox = currIndex == 0 ? currBox : periods[currIndex-1].name;
         let nextBox = currIndex == periods.length - 1 ? currBox : periods[currIndex+1].name;
 
-        let box = remembered ? nextBox : prevBox;
+        let box = Boolean(remembered) ? nextBox : prevBox;
         mnemon.box = box;
-        mnemon.save(callback);
+        mnemon.save((err, m) => {
+            if (err) return callback(err);
+
+            let log = new Model.review_log({
+                card: m.card,
+                user: m.user,
+                deck: m.deck,
+                box: m.box,
+            });
+            log.save((err) => {
+                callback(err, m);
+            });
+        });
     });
 }
 

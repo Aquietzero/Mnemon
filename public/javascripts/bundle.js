@@ -37712,7 +37712,7 @@
 /* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Backbone, Card, MobileDetect, Mousetrap, ReviewCardView, ReviewView, ZenCardView, _, template,
+	var $, Backbone, Card, MobileDetect, Mousetrap, ReviewCardView, ReviewView, ZenCardView, _, ajax, template,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
@@ -37727,6 +37727,8 @@
 	__webpack_require__(62);
 
 	MobileDetect = __webpack_require__(64);
+
+	ajax = __webpack_require__(34);
 
 	Card = __webpack_require__(39);
 
@@ -37767,7 +37769,7 @@
 	  };
 
 	  ReviewView.prototype.fetch = function() {
-	    return $.ajax({
+	    return ajax({
 	      url: '/review/pick',
 	      method: 'post',
 	      data: {
@@ -37836,7 +37838,7 @@
 	  };
 
 	  ReviewView.prototype.rememberACard = function(card, remembered) {
-	    return $.ajax({
+	    return ajax({
 	      url: '/review/put',
 	      method: 'post',
 	      data: {

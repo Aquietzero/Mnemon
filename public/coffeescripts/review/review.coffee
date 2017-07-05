@@ -5,6 +5,7 @@ Mousetrap = require 'mousetrap'
 require './review.css'
 
 MobileDetect = require '../device.coffee'
+ajax = require '../ajax.coffee'
 
 Card = require '../card/card.coffee'
 ReviewCardView = require '../review_card/review_card_view.coffee'
@@ -42,7 +43,7 @@ class ReviewView extends Backbone.View
         @
 
     fetch: ->
-        $.ajax
+        ajax
             url: '/review/pick'
             method: 'post'
             data:
@@ -94,7 +95,7 @@ class ReviewView extends Backbone.View
         @rememberACard card, false
 
     rememberACard: (card, remembered) ->
-        $.ajax
+        ajax
             url: '/review/put'
             method: 'post'
             data:

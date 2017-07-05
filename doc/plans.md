@@ -107,3 +107,7 @@ Goal: Add c(w1, w2) to w1.
 
 So that in the set of [w1, w2, wi...], each contains connections from [(w1, w2, wj(where j != i))], and [w1, w2, wi...] is called a grammar group, which is also closed. Connections only transit once.
 
+## Configuration of reviewing cards
+
+1. Control the number of new cards for each day.
+2. Statistics of review process.
