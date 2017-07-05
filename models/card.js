@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var mnemonDb = require('../model').mnemonDb;
 var mongoose = require('mongoose');
+var crypto = require('crypto');
 var Schema = mongoose.Schema;
 
 var CardSchema = new Schema({
@@ -13,6 +14,18 @@ var CardSchema = new Schema({
 
     // e.g.: words, phrases, grammar points.
     title: {
+        type: String,
+        require: true,
+        index: true,
+    },
+
+    user: {
+        type: String,
+        require: true,
+        index: true,
+    },
+
+    md5: {
         type: String,
         require: true,
         index: true,
@@ -53,6 +66,19 @@ var CardSchema = new Schema({
         default: Date.now
     },
 });
+
+CardSchema.pre('save', function (cb) {
+    this.md5 = this.generateMD5();
+    cb();
+});
+
+CardSchema.methods.generateMD5 = function () {
+    if (this.md5) return this.md5;
+
+    var user = this.user || 'zero';
+    var info = this.deck + this.user + this.title;
+    return crypto.createHash('md5').update(info).digest('hex');
+}
 
 CardSchema.methods.sentences = function () {
     var title = this.title;

@@ -9,6 +9,8 @@ module.exports = function (app) {
             var defaultQ = {q: {}, limit: 20, skip: 0};
             var query = _.extend(defaultQ, req.body.query || {});
 
+            query.user = req.session.user.name;
+
             Model.deck
             .find(query.q)
             .skip(query.skip)

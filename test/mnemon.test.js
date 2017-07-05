@@ -1,8 +1,9 @@
-var _ = require('lodash');
-var async = require('async');
-var Model = require('../model');
+const _ = require('lodash');
+const async = require('async');
+const Model = require('../model');
+const {clean} = require('./utils');
 
-var decks = [{
+let decks = [{
     name: 'deck1',
     user: 'zero',
 }, {
@@ -10,7 +11,7 @@ var decks = [{
     user: 'zero',
 }];
 
-var cards = [{
+let cards = [{
     title: 'card1',
     explain: 'card1',
     content: 'card1',
@@ -27,7 +28,7 @@ var cards = [{
     deck: 'deck1',
 }];
 
-var setup = (callback) => {
+let setup = (callback) => {
     async.series([
         (next) => {
             async.map(decks, (d, cb) => {
@@ -40,16 +41,6 @@ var setup = (callback) => {
             }, next);
         },
     ], callback);
-}
-
-var clean = (callback) => {
-    var collections = ['card', 'deck', 'mnemon'];
-
-    async.map(collections, (c, next) => {
-        Model[c].remove({}, (err) => {
-            next();
-        });
-    }, callback);
 }
 
 

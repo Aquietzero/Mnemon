@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const async = require('async');
 const Model = require('../model');
+const {clean} = require('./utils');
 
 let cardJSON = {
     "title" : "限り",
@@ -14,10 +15,24 @@ let cardJSON = {
 }
 
 describe('Test for card.', () => {
+    beforeEach((done) => {
+        clean(done);
+    });
+
+    describe('Card#generateMD5', () => {
+        it('should be able to generate md5 for a card.', (done) => {
+            let c = new Model.card(cardJSON);
+            c.save((err, _c) => {
+                _c.md5.should.equal('3195a09274a9f3f4f9ec00c3d3ebc8ff');
+                done();
+            });
+        });
+    });
+
     describe('Card#sentences', () => {
         it('should be able to generate sentences for a card.', (done) => {
             let c = new Model.card(cardJSON);
-            console.log(c.sentences());
+            //console.log(c.sentences());
             done();
         });
     });
