@@ -39122,7 +39122,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.zen-card {\n  position: relative;\n  width: 100%;\n}\n\n.zen-card .section {\n  padding: 20px;\n}\n\n.zen-card .header {\n  font-size: 0.5em;\n  text-align: center;\n}\n\n.zen-card input,\n.zen-card textarea {\n  border: none;\n  width: 100%;\n}\n\n.zen-card textarea.content {\n  min-height: 290px;\n}\n.zen-card textarea.explain {\n  min-height: 30px;\n}\n\n.zen-card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.zen-card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.zen-card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.zen-card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n", ""]);
+	exports.push([module.id, "\n.zen-card {\n  position: relative;\n  padding-bottom: 60px;\n  width: 100%;\n}\n\n.zen-card .section {\n  padding: 20px;\n}\n\n.zen-card .header {\n  font-size: 0.5em;\n  text-align: center;\n}\n\n.zen-card input,\n.zen-card textarea {\n  border: none;\n  width: 100%;\n}\n\n.zen-card textarea.content {\n  min-height: 290px;\n}\n.zen-card textarea.explain {\n  min-height: 30px;\n}\n\n.zen-card .title {\n  text-align: center;\n  font-size: 1.7em;\n  font-weight: bold;\n}\n\n.zen-card .sub-title {\n  text-align: center;\n  font-size: 1.2em;\n}\n\n.zen-card .explain {\n  font-size: 1.1em;\n  text-align: center;\n}\n\n.zen-card .content {\n  font-size: 1em;\n  text-align: left;\n}\n\n", ""]);
 
 	// exports
 
