@@ -27,8 +27,8 @@ module.exports = (app) => {
             let data = {setup: false, deck: null, stats: []};
 
             async.series([
-                function (next) {
-                    Model.deck.findOne({name: deck}, function (err, deck) {
+                (next) => {
+                    Model.deck.findOne({name: deck}, (err, deck) => {
                         if (err || !deck) return next(err || 'deck does not exist.');
 
                         data.deck = deck.toJSON();
@@ -37,7 +37,7 @@ module.exports = (app) => {
                         next();
                     });
                 },
-                function (next) {
+                (next) => {
                     Model.mnemon.find({deck: deck}, (err, mnemons) => {
                         if (err) return next(err);
 
@@ -56,11 +56,88 @@ module.exports = (app) => {
                         next();
                     });
                 }
-            ], function (err) {
+            ], (err) => {
                 if (err) return res.send({message: 'failed', error: err});
                 res.send({
                     message: 'ok',
                     data: data,
+                });
+            });
+        },
+
+        // Review efficiency is defined by a rate: number of cards / number of reviews.
+        // The more the efficiency close to 1, the more efficient the review is.
+        efficiency: (req, res) => {
+            let deck = req.params.deck;
+            let range = 10;
+            let today = new Date();
+            let from = new Date();
+            from.setDate(today.getDate() - range);
+            let data = [];
+
+            Model.review_log.find({deck: deck, created_at: {$gt: from}}, (err, logs) => {
+                if (err) return res.send({message: 'failed', error: err});
+
+                let byDate = _.groupBy(logs, (l) => {
+                    return moment(l.created_at).format('YYYY-MM-DD');
+                });
+
+                let efficiencyByDate = {};
+                _.each(byDate, (logs, date) => {
+                    efficiency = _.uniqBy(logs, 'card').length / logs.length;
+                    efficiencyByDate[date] = efficiency;
+                });
+
+                let formatDate;
+                for (let d = from; d <= today; d.setDate(d.getDate() + 1)) {
+                    formatDate = moment(d).format('YYYY-MM-DD');
+                    data.push([(new Date(formatDate)).valueOf(), efficiencyByDate[formatDate] || 0]);
+                }
+
+                res.send({
+                    message: 'ok',
+                    data: data,
+                });
+            });
+        },
+
+        boxDistribution: (req, res) => {
+            let range = 10;
+            let today = new Date();
+            let from = new Date();
+            from.setDate(today.getDate() - range);
+            let data = [];
+
+            Model.review_log.find({created_at: {$gt: from}}, (err, logs) => {
+                if (err) return res.send({message: 'failed', error: err});
+
+                let dates = [];
+                for (let d = from; d <= today; d.setDate(d.getDate() + 1)) {
+                    dates.push(moment(d).format('YYYY-MM-DD'));
+                }
+
+                let byDate = _.groupBy(logs, (l) => {
+                    return moment(l.created_at).format('YYYY-MM-DD');
+                });
+
+                let efficiencyByDate = {};
+                _.each(byDate, (logs, date) => {
+                    efficiencyByDate[date] = _.countBy(logs, 'box');
+                });
+
+                let series = [];
+                _.each(_.reverse(periods), (p) => {
+                    series.push({
+                        name: p.display,
+                        data: _.map(dates, (date) => {
+                            return [(new Date(date)).valueOf(), efficiencyByDate[date] && efficiencyByDate[date][p.name] || 0];
+                        })
+                    });
+                });
+
+                res.send({
+                    message: 'ok',
+                    data: series,
                 });
             });
         },

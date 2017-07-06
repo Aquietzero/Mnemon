@@ -20,4 +20,7 @@ module.exports = (app) => {
     app.get('/review/:deck/statistics', Routers.review.statistics);
     app.post('/review/pick', Routers.review.pick);
     app.post('/review/put', Routers.review.put);
+
+    app.get('/review/:deck/efficiency', Routers.review.efficiency);
+    app.get('/review/:deck/box_distribution', Routers.review.boxDistribution);
 }
