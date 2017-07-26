@@ -126,7 +126,7 @@ module.exports = (app) => {
                 });
 
                 let series = [];
-                _.each(_.reverse(periods), (p) => {
+                _.eachRight(periods, (p) => {
                     series.push({
                         name: p.display,
                         data: _.map(dates, (date) => {
