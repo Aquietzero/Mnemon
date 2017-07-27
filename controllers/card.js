@@ -25,18 +25,34 @@ module.exports = function (app) {
             });
         },
 
-        detail: function (req, res) {
-            var title = req.body.title;
+        detail: (req, res) => {
+            let title = req.body.title;
             if (!title) {
                 return res.send({message: 'failed', error: 'lack of arguments.'});
             }
 
-            Model.card.findOne({title: title}, function (err, card) {
+            Model.card.findOne({title: title}, (err, card) => {
                 if (err) return res.send({message: 'failed', error: err});
 
                 return res.send({
                     message: 'ok',
                     data: card
+                });
+            });
+        },
+
+        remove: (req, res) => {
+            let title = req.body.title;
+            let deck = req.body.deck;
+
+            if (!title || !deck) return res.send({message: 'failed', error: 'lack of arguments.'});
+
+            Model.card.findOne({deck: deck, title: title}, (err, card) => {
+                if (err) return res.send({message: 'failed', error: err});
+                if (!card) return res.send({message: 'failed', error: 'card does not exist.'});
+
+                card.remove((err) => {
+                    return res.send({message: 'ok'});
                 });
             });
         },

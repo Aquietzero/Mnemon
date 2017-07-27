@@ -17,6 +17,10 @@ CardView = require '../card/card_view.coffee'
 class CardEntryView extends Backbone.View
     className: 'item card-entry'
 
+    constructor: ->
+        super
+        @listenTo @model, 'remove', @remove
+
     render: ->
         @$el.html card_entry_template(@model.toJSON())
         @$el.attr 'id', @model.get('title')
@@ -31,6 +35,7 @@ class CardsView extends Backbone.View
     events:
         'click .card-entry': 'preview'
         'click .add-a-card': 'addACard'
+        'click .card-entry .remove-card': 'removeCard'
         #'scroll .cards-list': 'scrolling'
 
     constructor: (options) ->
@@ -134,5 +139,20 @@ class CardsView extends Backbone.View
         if Math.abs(fixHeight + scrollTop - listHeight - paddingTop) < 30
             @query.page += 1
             @fetch()
+
+    removeCard: (e) ->
+        title = $(e.currentTarget).attr 'data'
+
+        ajax
+            url: '/cards/remove'
+            method: 'post'
+            data:
+                title: title
+                deck: @deck
+            success: (res) =>
+                return alert res.error unless res.message is 'ok'
+
+                card = @collection.findWhere title: title
+                @collection.remove card
 
 module.exports = CardsView

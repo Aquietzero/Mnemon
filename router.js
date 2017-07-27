@@ -14,6 +14,7 @@ module.exports = (app) => {
     app.post('/cards', Routers.card.all);
     app.post('/cards/detail', Routers.card.detail);
     app.post('/cards/update', Routers.card.update);
+    app.post('/cards/remove', Routers.card.remove);
 
     // Review
     app.get('/review/:deck/setup', Routers.review.setup);

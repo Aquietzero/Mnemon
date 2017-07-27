@@ -37001,11 +37001,12 @@
 	CardEntryView = (function(superClass) {
 	  extend(CardEntryView, superClass);
 
-	  function CardEntryView() {
-	    return CardEntryView.__super__.constructor.apply(this, arguments);
-	  }
-
 	  CardEntryView.prototype.className = 'item card-entry';
+
+	  function CardEntryView() {
+	    CardEntryView.__super__.constructor.apply(this, arguments);
+	    this.listenTo(this.model, 'remove', this.remove);
+	  }
 
 	  CardEntryView.prototype.render = function() {
 	    this.$el.html(card_entry_template(this.model.toJSON()));
@@ -37028,7 +37029,8 @@
 
 	  CardsView.prototype.events = {
 	    'click .card-entry': 'preview',
-	    'click .add-a-card': 'addACard'
+	    'click .add-a-card': 'addACard',
+	    'click .card-entry .remove-card': 'removeCard'
 	  };
 
 	  function CardsView(options) {
@@ -37165,6 +37167,31 @@
 	    }
 	  };
 
+	  CardsView.prototype.removeCard = function(e) {
+	    var title;
+	    title = $(e.currentTarget).attr('data');
+	    return ajax({
+	      url: '/cards/remove',
+	      method: 'post',
+	      data: {
+	        title: title,
+	        deck: this.deck
+	      },
+	      success: (function(_this) {
+	        return function(res) {
+	          var card;
+	          if (res.message !== 'ok') {
+	            return alert(res.error);
+	          }
+	          card = _this.collection.findWhere({
+	            title: title
+	          });
+	          return _this.collection.remove(card);
+	        };
+	      })(this)
+	    });
+	  };
+
 	  return CardsView;
 
 	})(Backbone.View);
@@ -37207,7 +37234,7 @@
 
 
 	// module
-	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n", ""]);
+	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  position: relative;\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n\n.card-entry .card-action {\n  display: none;\n  position: absolute;\n  right: 5px;\n  top: 50%;\n  margin-top: -8px;\n}\n.card-entry:hover .card-action {\n  display: block;\n}\n", ""]);
 
 	// exports
 
@@ -37234,7 +37261,9 @@
 	((__t = ( data.sub_title )) == null ? '' : __t) +
 	' <span class="word-content">' +
 	((__t = ( data.explain.length > 20 ? data.explain.slice(0, 20) + '...' : data.explain )) == null ? '' : __t) +
-	'</span></div>\n\n  <!--\n  <div class="right floated content">\n    <i class="remove middle aligned icon remove-card"></i>\n  </div>\n  -->\n</div>\n';
+	'</span></div>\n</div>\n<div class="card-action remove-card" data="' +
+	((__t = ( data.title )) == null ? '' : __t) +
+	'">\n  <i class="remove icon"></i>\n</div>\n';
 	return __p
 	}
 

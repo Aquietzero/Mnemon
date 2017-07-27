@@ -11,7 +11,7 @@ module.exports = (app) => {
             let deck = req.params.deck;
             if (!deck) return res.send({message: 'failed', error: 'lack of arguments.'});
 
-            let user = 'zero';
+            let user = req.session.user.name;
             Model.mnemon.reviewDeck(user, deck, (err) => {
                 if (err) return res.send({message: 'failed', error: err});
 
@@ -21,7 +21,8 @@ module.exports = (app) => {
 
         statistics: (req, res) => {
             let deck = req.params.deck;
-            if (!deck) return res.send({message: 'failed', error: 'lack of arguments.'});
+            let user = req.session.user.name;
+            if (!deck || !user) return res.send({message: 'failed', error: 'lack of arguments.'});
 
             // `setup` denotes whether the review flow is setup or not.
             let data = {setup: false, deck: null, stats: []};
@@ -38,7 +39,7 @@ module.exports = (app) => {
                     });
                 },
                 (next) => {
-                    Model.mnemon.find({deck: deck}, (err, mnemons) => {
+                    Model.mnemon.find({deck: deck, user: user}, (err, mnemons) => {
                         if (err) return next(err);
 
                         if (mnemons.length == 0) return next();
@@ -145,7 +146,7 @@ module.exports = (app) => {
         pick: (req, res) => {
             let deck = req.body.deck;
             let n = parseInt(req.body.n || 20);
-            let user = 'zero';
+            let user = req.session.user.name;
 
             if (!deck) return res.send({message: 'failed', error: 'lack of arguments.'});
 
@@ -160,7 +161,7 @@ module.exports = (app) => {
         put: (req, res) => {
             let deck = req.body.deck;
             let card = req.body.card;
-            let user = 'zero';
+            let user = req.session.user.name;
             let remembered = req.body.remembered || false;
 
             if (!deck || !card || !user) {
