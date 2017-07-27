@@ -47,13 +47,23 @@ module.exports = function (app) {
 
             if (!title || !deck) return res.send({message: 'failed', error: 'lack of arguments.'});
 
-            Model.card.findOne({deck: deck, title: title}, (err, card) => {
-                if (err) return res.send({message: 'failed', error: err});
-                if (!card) return res.send({message: 'failed', error: 'card does not exist.'});
+            async.series([
+                (next) => {
+                    Model.card.findOne({deck: deck, title: title}, (err, card) => {
+                        if (err || !card) return next(err || 'card does not exist.');
 
-                card.remove((err) => {
-                    return res.send({message: 'ok'});
-                });
+                        card.remove((err) => {return next()});
+                    });
+                },
+                (next) => {
+                    Model.deck.findOne({name: deck}, (err, deck) => {
+                        deck.number_of_cards -= 1;
+                        deck.save(next);
+                    });
+                }
+            ], (err) => {
+                if (err) return res.send({message: 'failed', error: err});
+                res.send({message: 'ok'});
             });
         },
 
