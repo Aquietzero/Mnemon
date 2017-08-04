@@ -18287,7 +18287,6 @@
 	    this.connectionsEditor = new TagsEditorView();
 	    socket.on('searched:word', (function(_this) {
 	      return function(res) {
-	        console.log(res.data);
 	        if (!res.err) {
 	          _this.wordExplain = res.data;
 	          _this.renderWordExplain(res.data);
@@ -37237,7 +37236,7 @@
 
 
 	// module
-	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  position: relative;\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n\n.card-entry .card-action {\n  display: none;\n  position: absolute;\n  right: 5px;\n  top: 50%;\n  margin-top: -8px;\n}\n.card-entry:hover .card-action {\n  display: block;\n}\n", ""]);
+	exports.push([module.id, ".search-and-add {\n  position: fixed;\n  background: white;\n  display: block;\n  top: 0;\n  padding-top: 14px;\n  z-index: 100;\n}\n\n.cards-list .search-result {\n  margin-top: 120px !important;\n}\n\n.cards-list {\n  min-height: 100%;\n  border-right: solid 1px #999;\n  overflow: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n\n.cards-list .search-delimiter {\n  margin: 14px 0;\n}\n\n.card-entry {\n  position: relative;\n  cursor: pointer;\n  padding-left: 10px !important;\n}\n\n.card-entry .description {\n  font-size: 0.8em;\n}\n\n.card-entry .word-content {\n  color: #999;\n}\n\n.card-entry:hover {\n  background: #eee;\n}\n.card-entry.active {\n  background: #e5e5e5;\n}\n\n.card-entry .card-action {\n  display: none;\n  position: absolute;\n  right: 5px;\n  top: 50%;\n  margin-top: -8px;\n}\n.card-entry:hover .card-action {\n  display: block;\n}\n", ""]);
 
 	// exports
 
