@@ -103,22 +103,25 @@ class CardView extends Backbone.View
         return unless @wordExplain or @wordExplain.explains
 
         explains = @wordExplain.explains
-        @model.set 'sub_title', "#{explains[0].kana}#{explains[0].tone}"
+        @model.set 'sub_title', "#{explains[0].subTitle}"
 
         # '2. 禁，戒，戒除。〔禁止する〕。たばこを戒める。戒烟。'
         # extract '禁，戒，戒除' from the above sentence. the leading '2' is
         # no necessarily a number.
-        briefExplainRe = /\.\s+(.*?)。/g
-        briefExplains = _.compact(_.flatten(_.map @wordExplain.explains, (e) ->
-            results = []
-            r = briefExplainRe.exec e.content
-            while r
-                results.push r[1]
+        if @wordExplain.briefExplain
+            @model.set 'explain', @wordExplain.briefExplain
+        else
+            briefExplainRe = /\.\s+(.*?)。/g
+            briefExplains = _.compact(_.flatten(_.map @wordExplain.explains, (e) ->
+                results = []
                 r = briefExplainRe.exec e.content
-            _.compact results
-        ))
+                while r
+                    results.push r[1]
+                    r = briefExplainRe.exec e.content
+                _.compact results
+            ))
+            @model.set 'explain', briefExplains.join('\n')
 
-        @model.set 'explain', briefExplains.join('\n')
         @model.set 'content', _.pluck(explains, 'content').join('\r\r')
 
         console.log @model.toJSON()

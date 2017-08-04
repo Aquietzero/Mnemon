@@ -18287,6 +18287,7 @@
 	    this.connectionsEditor = new TagsEditorView();
 	    socket.on('searched:word', (function(_this) {
 	      return function(res) {
+	        console.log(res.data);
 	        if (!res.err) {
 	          _this.wordExplain = res.data;
 	          _this.renderWordExplain(res.data);
@@ -18388,19 +18389,23 @@
 	      return;
 	    }
 	    explains = this.wordExplain.explains;
-	    this.model.set('sub_title', "" + explains[0].kana + explains[0].tone);
-	    briefExplainRe = /\.\s+(.*?)。/g;
-	    briefExplains = _.compact(_.flatten(_.map(this.wordExplain.explains, function(e) {
-	      var r, results;
-	      results = [];
-	      r = briefExplainRe.exec(e.content);
-	      while (r) {
-	        results.push(r[1]);
+	    this.model.set('sub_title', "" + explains[0].subTitle);
+	    if (this.wordExplain.briefExplain) {
+	      this.model.set('explain', this.wordExplain.briefExplain);
+	    } else {
+	      briefExplainRe = /\.\s+(.*?)。/g;
+	      briefExplains = _.compact(_.flatten(_.map(this.wordExplain.explains, function(e) {
+	        var r, results;
+	        results = [];
 	        r = briefExplainRe.exec(e.content);
-	      }
-	      return _.compact(results);
-	    })));
-	    this.model.set('explain', briefExplains.join('\n'));
+	        while (r) {
+	          results.push(r[1]);
+	          r = briefExplainRe.exec(e.content);
+	        }
+	        return _.compact(results);
+	      })));
+	      this.model.set('explain', briefExplains.join('\n'));
+	    }
 	    this.model.set('content', _.pluck(explains, 'content').join('\r\r'));
 	    return console.log(this.model.toJSON());
 	  };
@@ -36703,9 +36708,7 @@
 
 	 data.explains.forEach(function (explain) { ;
 	__p += '\n  <div>\n    <h3>' +
-	((__t = ( explain.kana )) == null ? '' : __t) +
-	' ' +
-	((__t = ( explain.tone )) == null ? '' : __t) +
+	((__t = ( explain.subTitle )) == null ? '' : __t) +
 	'</h3>\n    ';
 	 explain.content.split('\n').forEach(function (line) { ;
 	__p += '\n      <p>' +
